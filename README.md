@@ -20,16 +20,15 @@
 ;; 176 209 198 148 91 224 221 107 123 52 13 66 146 142 201)
 
 ;; decode multihash into component parts
-(let* ((bytes (ironclad:hex-string-to-byte-array "11140beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33"))
-       (decoded (multihash:decode bytes)))
-  (format nil "~S" decoded))
 
-;; => "#S(CL-MULTIHASH::DECODED-MULTIHASH
+(multihash:decode (ironclad:hex-string-to-byte-array "11140beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33"))
+
+;; => #S(CL-MULTIHASH::DECODED-MULTIHASH
 ;;   :CODE 17
 ;;   :NAME IRONCLAD:SHA1
 ;;   :LENGTH 20
 ;;   :DIGEST #(11 238 199 181 234 63 15 219 201 93 13 212 127 60 91 194 117 218
-;;             138 51))"
+;;             138 51))
 
 ```
 
