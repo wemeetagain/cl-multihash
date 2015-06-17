@@ -7,7 +7,7 @@
 (defpackage cl-multihash-tests
   (:use :cl :multihash)
   (:import-from :5am def-suite fail in-suite is run! test)
-  (:import-from :multihash multihash-definition-code multihash-definition-name)
+  (:shadowing-import-from :multihash multihash-definition-code multihash-definition-name)
   (:shadowing-import-from :ironclad byte-array-to-hex-string hex-string-to-byte-array)
   (:export run-all-tests))
 
