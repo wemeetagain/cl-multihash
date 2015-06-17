@@ -31,7 +31,7 @@
     (#x40 blake2b)
     (#x41 blake2s)))
 
-(defvar test-cases 
+(defvar test-cases
   '(("0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33" #x11 sha1)
     ("0beec7b5" #x11 sha1)
     ("2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae" #x12 sha256)
@@ -122,7 +122,7 @@
             "Table mismatch: ~X ~X"
             (multihash-definition-code (gethash name *multihash-definitions*))
             code)))
-          
+
 (test valid-code
   (loop for code below #xff
         do (let* ((test-code-exists ((lambda (code)
