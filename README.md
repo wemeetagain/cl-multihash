@@ -1,5 +1,7 @@
 # cl-multihash
 
+[![Build Status](https://api.travis-ci.org/WeMeetAgain/cl-multihash.svg?branch=master)](https://travis-ci.org/WeMeetAgain/cl-multihash)
+
 [Multihash](https://github.com/jbenet/multihash) utility for Common Lisp
 
 ## Examples
