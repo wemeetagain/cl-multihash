@@ -18,8 +18,8 @@ script:
                  (lambda (c h)
                    (declare (ignore c h))
                    (uiop:quit -1)))'
-       -e '(ql:quickload :cl-multihash-tests)'
-       -e '(cl-multihash-tests:run-all-tests)'
+       -e '(ql:quickload :cl-multihash)'
+       -e '(asdf:oos (quote asdf:test-op) :cl-multihash)'
 
 notifications:
   email:
