@@ -2,12 +2,16 @@
 ;;;;
 ;;;; multihash test suite
 
-(in-package :cl-multihash)
+(in-package :cl-user)
 
-;; Set up tests to include 5AM test functions
-(eval-when (:compile-toplevel :load-toplevel :execute)
-  (import '(5am:def-suite 5am:fail 5am:in-suite 5am:is 5am:run! 5am:test))
-  (export 'run-all-tests))
+(defpackage cl-multihash-tests
+  (:use :cl :multihash)
+  (:import-from :5am def-suite fail in-suite is run! test)
+  (:import-from :multihash multihash-definition-code multihash-definition-name)
+  (:shadowing-import-from :ironclad byte-array-to-hex-string hex-string-to-byte-array)
+  (:export run-all-tests))
+
+(in-package :cl-multihash-tests)
 
 (def-suite cl-multihash)
 
@@ -113,7 +117,7 @@
 
 (test table
   (loop for (code name) in test-codes
-        do 
+        do
         (is (eq (multihash-definition-name (gethash code *multihash-definitions*)) name)
             "Table mismatch: ~S ~S"
             (multihash-definition-name (gethash code *multihash-definitions*))
