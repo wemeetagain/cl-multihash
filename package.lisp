@@ -2,18 +2,31 @@
 
 (defpackage #:cl-multihash
   (:nicknames :multihash)
-  (:use #:cl #:ironclad)
-  (:shadow null)
+  (:use #:cl)
+  (:import-from #:ironclad
+		#:digest-file
+		#:digest-stream
+		#:digest-sequence
+		#:unsupported-digest
+		#:sha1 #:sha256 #:sha512)
   (:export
    #:*multihash-definitions*
    ;; hash name symbols
    #:sha1 #:sha256 #:sha512 #:sha3 #:blake2b #:blake2s
    ;; decoded-multihash slot accessors
-   #:decoded-multihash-code #:decoded-multihash-name
-   #:decoded-multihash-length #:decoded-multihash-digest
+   #:decoded-multihash
+   #:decoded-multihash-code
+   #:decoded-multihash-name
+   #:decoded-multihash-length
+   #:decoded-multihash-digest
    ;; core functions
    #:encode #:decode
    ;; high level functions
-   #:multihash-file #:multihash-stream #:multihash-sequence
+   #:multihash-file
+   #:multihash-stream
+   #:multihash-sequence
    ;; utility functions
-   #:app-code-p #:valid-code-p))
+   #:app-code-p
+   #:valid-code-p
+   #:base58-to-octets
+   #:octets-to-base58))

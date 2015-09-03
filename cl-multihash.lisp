@@ -49,7 +49,7 @@
 (defun app-code-p (code)
   "Checks whether a multihash code is part of the valid app range."
   (and
-   (numberp code)
+   (integerp code)
    (>= code 0)
    (< code #x10)))
 
@@ -70,7 +70,7 @@ SEQUENCE must be a (SIMPLE-ARRAY (UNSIGNED-BYTE 8) (*))"
     (symbol
      (let ((multihash-definition (gethash digest-name *multihash-definitions*)))
        (cond
-         ((cl:null multihash-definition) (error 'unsupported-digest digest-name))
+         ((null multihash-definition) (error 'unsupported-digest digest-name))
          ((> (length sequence) 127) (error "Length Not Supported: ~S" sequence))
          (t (concatenate '(vector (unsigned-byte 8) *)
                          (vector (multihash-definition-code multihash-definition) (length sequence))
@@ -121,3 +121,11 @@ and SBCL, SEQUENCE can be any vector with an element-type
 of (UNSIGNED-BYTE 8); for other implementations, SEQUENCE must be a
 (SIMPLE-ARRAY (UNSIGNED-BYTE 8) (*))."
   (encode digest-name (digest-sequence digest-name sequence)))
+
+(defun octets-to-base58 (octets)
+  (declare (type (vector (unsigned-byte 8)) octets))
+  (base58:encode (babel:octets-to-string octets)))
+
+(defun base58-to-octets (string)
+  (declare (type string string))
+  (babel:string-to-octets (base58:decode string)))
