@@ -42,7 +42,7 @@
   "multihash definitions mapped by digest symbol and multihash code")
 
 (deftype multihash ()
-  '(satisfies multihashp))
+  '(satisfies multihash-p))
 
 (defstruct decoded-multihash
   code name length digest)
@@ -61,7 +61,7 @@
     ((member code *multihash-definitions* :key #'multihash-definition-code) t)
     (t nil)))
 
-(defun multihashp (sequence)
+(defun multihash-p (sequence)
   "Return T if SEQUENCE is a valid multihash, otherwise, return NIL.
 
 SEQUENCE must be a (SIMPLE-ARRAY (UNSIGNED-BYTE 8) (*))"

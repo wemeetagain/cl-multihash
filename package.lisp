@@ -28,6 +28,7 @@
    ;; utility functions
    #:app-code-p
    #:valid-code-p
+   #:multihash-p
    #:from-base58
    #:to-base58
    #:from-hex-string
