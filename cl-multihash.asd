@@ -11,7 +11,7 @@
   :components ((:file "package")
                (:file "cl-multihash")))
 
-(defsystem #:cl-multihash-tests
+(defsystem #:cl-multihash-test
   :name "cl-multihash tests"
   :description "Unit tests for cl-multihash"
   :depends-on (:cl-multihash :fiveam)
@@ -19,5 +19,5 @@
 
 (defmethod perform ((op asdf:test-op) (system (eql (find-system :cl-multihash))))
   (format t "Loading tests.~%")
-  (oos 'load-op :cl-multihash-tests)
-  (oos 'test-op :cl-multihash-tests))
+  (oos 'load-op :cl-multihash-test)
+  (oos 'test-op :cl-multihash-test))

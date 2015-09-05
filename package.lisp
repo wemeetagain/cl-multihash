@@ -28,5 +28,7 @@
    ;; utility functions
    #:app-code-p
    #:valid-code-p
-   #:base58-to-octets
-   #:octets-to-base58))
+   #:from-base58
+   #:to-base58
+   #:from-hex-string
+   #:to-hex-string))

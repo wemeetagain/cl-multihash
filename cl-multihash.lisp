@@ -25,23 +25,24 @@
 
 (in-package #:multihash)
 
-(defvar *multihash-definitions* (make-hash-table)
-  "multihash definitions mapped by digest symbol and multihash code")
+(defparameter *definitions*
+  '((sha1 #x11 20)
+    (sha256 #x12 32)
+    (sha512 #x13 64)
+    (sha3 #x14 64)
+    (blake2b #x40 64)
+    (blake2s #x41 32)))
 
 (defstruct multihash-definition
   name code length)
 
-(defun defmultihash (name code length)
-  (let ((multihash-definition (make-multihash-definition :name name :code code :length length)))
-    (setf (gethash name *multihash-definitions*) multihash-definition)
-    (setf (gethash code *multihash-definitions*) multihash-definition)))
+(defparameter *multihash-definitions*
+  (loop for (name code length) in *definitions*
+     collect (make-multihash-definition :name name :code code :length length))
+  "multihash definitions mapped by digest symbol and multihash code")
 
-(defmultihash 'sha1 #x11 20)
-(defmultihash 'sha256 #x12 32)
-(defmultihash 'sha512 #x13 64)
-(defmultihash 'sha3 #x14 64)
-(defmultihash 'blake2b #x40 64)
-(defmultihash 'blake2s #x41 32)
+(deftype multihash ()
+  '(satisfies multihashp))
 
 (defstruct decoded-multihash
   code name length digest)
@@ -57,8 +58,21 @@
   "Checks whether a multihash code is valid."
   (cond
     ((app-code-p code) t)
-    ((gethash code *multihash-definitions*) t)
+    ((member code *multihash-definitions* :key #'multihash-definition-code) t)
     (t nil)))
+
+(defun multihashp (sequence)
+  "Return T if SEQUENCE is a valid multihash, otherwise, return NIL.
+
+SEQUENCE must be a (SIMPLE-ARRAY (UNSIGNED-BYTE 8) (*))"
+  (declare (type (simple-array (unsigned-byte 8)) sequence))
+  (block nil
+    (handler-bind ((error (lambda (condition)
+                            (declare (ignore condition))
+                            (return nil))))
+      (let ((decoded (decode sequence)))
+        (if (valid-code-p (decoded-multihash-code decoded))
+            t)))))
 
 (defun encode (digest-name sequence)
   "Encode a hash digest along with the specified function code. Note: the
@@ -68,7 +82,7 @@ SEQUENCE must be a (SIMPLE-ARRAY (UNSIGNED-BYTE 8) (*))"
   (declare (type (simple-array (unsigned-byte 8)) sequence))
   (typecase digest-name
     (symbol
-     (let ((multihash-definition (gethash digest-name *multihash-definitions*)))
+     (let ((multihash-definition (find digest-name *multihash-definitions* :key #'multihash-definition-name)))
        (cond
          ((null multihash-definition) (error 'unsupported-digest digest-name))
          ((> (length sequence) 127) (error "Length Not Supported: ~S" sequence))
@@ -77,8 +91,6 @@ SEQUENCE must be a (SIMPLE-ARRAY (UNSIGNED-BYTE 8) (*))"
                          sequence)))))
     (t
      (error 'type-error :datum digest-name :expected-type 'symbol))))
-
-;;; multihash high-level functions
 
 (defun decode (sequence)
   "Decode a hash from a given multihash. Returns a DECODED-MULTIHASH struct or
@@ -93,16 +105,18 @@ SEQUENCE must be a (SIMPLE-ARRAY (UNSIGNED-BYTE 8) (*))"
      (let ((decoded
 	    (make-decoded-multihash
 	     :code (aref sequence 0)
-	     :name (multihash-definition-name (gethash (aref sequence 0) *multihash-definitions*))
+	     :name (multihash-definition-name (find (aref sequence 0) *multihash-definitions* :key #'multihash-definition-code))
 	     :length (aref sequence 1)
 	     :digest (subseq sequence 2))))
        (cond
          ((not (= (length (decoded-multihash-digest decoded)) (decoded-multihash-length decoded)))
-          (error "Inconsistent Length: ~S" decoded))
+          (error "Inconsistent Length: ~S, length ~D should equal ~D" decoded (length (decoded-multihash-digest decoded)) (decoded-multihash-length decoded)))
          ((not (valid-code-p (decoded-multihash-code decoded)))
           (error "Invalid Multihash Code: ~S" decoded))
          (t
           decoded))))))
+
+;;; multihash high-level functions
 
 (defun multihash-file (digest-name pathname)
   "Return the multihash of the contents of the file named by PATHNAME using
@@ -122,10 +136,38 @@ of (UNSIGNED-BYTE 8); for other implementations, SEQUENCE must be a
 (SIMPLE-ARRAY (UNSIGNED-BYTE 8) (*))."
   (encode digest-name (digest-sequence digest-name sequence)))
 
-(defun octets-to-base58 (octets)
-  (declare (type (vector (unsigned-byte 8)) octets))
-  (base58:encode (babel:octets-to-string octets)))
+;;; extra utilities
 
-(defun base58-to-octets (string)
+(defun chars-to-byte-array (chars)
+  (declare (type string chars))
+  (loop with vector = (make-sequence '(vector (unsigned-byte 8)) (length chars))
+     for index below (length chars)
+     do (setf (aref vector index) (char-code (aref chars index)))
+     finally (return vector)))
+
+(defun byte-array-to-chars (bytes)
+  (declare (type (vector (unsigned-byte 8)) bytes))
+  (loop with chars = (make-sequence 'string (length bytes))
+     for index below (length bytes)
+     do (setf (aref chars index) (code-char (aref bytes index)))
+     finally (return chars)))
+
+(defun to-base58 (octets)
+  (declare (type multihash octets))
+  (base58:encode (byte-array-to-chars octets)))
+
+(defun from-base58 (string)
   (declare (type string string))
-  (babel:string-to-octets (base58:decode string)))
+  (let ((multihash (chars-to-byte-array (base58:decode string))))
+    (declare (type multihash multihash))
+    multihash))
+
+(defun to-hex-string (octets)
+  (declare (type multihash octets))
+  (ironclad:byte-array-to-hex-string octets))
+
+(defun from-hex-string (string)
+  (declare (type string string))
+  (let ((multihash (ironclad:hex-string-to-byte-array string)))
+    (declare (type multihash multihash))
+    multihash))

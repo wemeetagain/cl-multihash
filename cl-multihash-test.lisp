@@ -20,7 +20,7 @@
 
 (in-suite cl-multihash)
 
-(defmethod asdf:perform ((o asdf:test-op) (c (eql (asdf:find-system :cl-multihash-tests))))
+(defmethod asdf:perform ((o asdf:test-op) (c (eql (asdf:find-system :cl-multihash-test))))
   (format t "Starting tests.~%")
   (run-all-tests)
   (format t "Tests finished.~%"))
@@ -118,13 +118,13 @@
 (test table
   (loop for (code name) in test-codes
         do
-        (is (eq (multihash-definition-name (gethash code *multihash-definitions*)) name)
+        (is (eq (multihash-definition-name (find code *multihash-definitions* :key #'multihash-definition-code)) name)
             "Table mismatch: ~S ~S"
-            (multihash-definition-name (gethash code *multihash-definitions*))
+            (multihash-definition-name (find code *multihash-definitions* :key #'multihash-definition-code))
             name)
-        (is (= (multihash-definition-code (gethash name *multihash-definitions*)) code)
+        (is (= (multihash-definition-code (find name *multihash-definitions* :key #'multihash-definition-name)) code)
             "Table mismatch: ~X ~X"
-            (multihash-definition-code (gethash name *multihash-definitions*))
+            (multihash-definition-code (find name *multihash-definitions* :key #'multihash-definition-name))
             code)))
 
 (test valid-code
