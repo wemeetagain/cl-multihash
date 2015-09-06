@@ -1,25 +1,35 @@
 language: common-lisp
-sudo: required
+sudo: false
 
 env:
+  global:
+    - PATH=~/.roswell/bin:$PATH
+    - ROSWELL_INSTALL_DIR=$HOME/.roswell
   matrix:
-    - LISP=sbcl
-    - LISP=ccl
+    - LISP=sbcl-bin COVERALLS=true
+    - LISP=ccl-bin
 
 install:
-  # Install cl-travis
-  - curl https://raw.githubusercontent.com/luismbo/cl-travis/master/install.sh | bash
+  # Install roswell
+  - curl -L https://raw.githubusercontent.com/snmsts/roswell/release/scripts/install-for-ci.sh | sh
+
+cache:
+  directories:
+    - $HOME/.roswell
+    - $HOME/.config/common-lisp
 
 script:
-  - cl -l fiveam
+  - ros -s fiveam
        -e '(setf fiveam:*debug-on-error* t
                  fiveam:*debug-on-failure* t)'
        -e '(setf *debugger-hook*
                  (lambda (c h)
                    (declare (ignore c h))
                    (uiop:quit -1)))'
-       -e '(ql:quickload :cl-multihash)'
-       -e '(asdf:oos (quote asdf:test-op) :cl-multihash)'
+       -e '(ql:quickload :cl-multihash-test)'
+       -e '(or (coveralls:with-coveralls (:exclude (list "cl-multihash-test.lisp"))
+		  (asdf:test-system :cl-multihash)
+                (uiop:quit -1))'
 
 notifications:
   email:
