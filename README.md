@@ -1,6 +1,7 @@
 # cl-multihash
 
 [![Build Status](https://api.travis-ci.org/WeMeetAgain/cl-multihash.svg?branch=master)](https://travis-ci.org/WeMeetAgain/cl-multihash)
+[![Coverage Status](https://coveralls.io/repos/WeMeetAgain/cl-multihash/badge.svg?branch=master&service=github)](https://coveralls.io/github/WeMeetAgain/cl-multihash?branch=master)
 
 [Multihash](https://github.com/jbenet/multihash) utility for Common Lisp
 
