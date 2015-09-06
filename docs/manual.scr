@@ -27,7 +27,7 @@ It is useful to write applications that future-proof their use of hashes, and al
         @cell(digest size hash digest)
     @end(header)
     @begin(row)
-        @cell(00010001) 
+        @cell(00010001)
         @cell(00000100)
         @cell(101101100 11111000 01011100 10110101)
     @end(row)
