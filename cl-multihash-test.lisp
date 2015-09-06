@@ -144,3 +144,26 @@
         do (is (eql (app-code-p code) (and (>= code 0) (< code #x10)))
                "APP-CODE-P incorrect for ~X"
                code)))
+
+(defparameter b58-hex-equiv
+  ;; generated with multihash tool
+  '(("Qmexf4GiBrD46cEFjQBNoUz6iKSGHNeJWmD88gLNYohgqS"
+     "1220f6f44b0636ea0fd0753339fc58379035c40a9efc356fd6ddf4841df4f4a85cb5")
+    ("QmfHUBdEnB6YXqxCZbmAduW8V5GZC6aTtGptWRhNPrpNKZ"
+     "1220fbc608b82bf6e18d22e717e091b5a79abb3e0e9e280e0ec25831170f52e04690")
+    ("QmdRYiSeNbR9cDei4mmUMc7RAQZ2CPQev6yTBEoJEqQxuC"
+     "1220e0206e2689ecaa75bdf76ac2b48124e09bb0d19dcb2744699b5d6a605a853a87")))
+
+(test from-base58-and-from-hex-string
+  (loop for (b58 hex) in b58-hex-equiv
+        do (is (vector-equal (from-base58 b58)
+                             (from-hex-string hex)))))
+(test to-base58
+  (loop for (b58 hex) in b58-hex-equiv
+        do (is (string= b58
+                        (to-base58 (from-hex-string hex))))))
+
+(test to-hex-string
+  (loop for (b58 hex) in b58-hex-equiv
+        do (is (string= (to-hex-string (from-base58 b58))
+                        hex))))
