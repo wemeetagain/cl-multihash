@@ -28,7 +28,7 @@ script:
                    (uiop:quit -1)))'
        -e '(ql:quickload :cl-multihash-test)'
        -e '(or (coveralls:with-coveralls (:exclude (list "cl-multihash-test.lisp"))
-		  (asdf:test-system :cl-multihash)
+                 (asdf:test-system :cl-multihash)
                 (uiop:quit -1))'
 
 notifications:
