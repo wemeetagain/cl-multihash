@@ -34,17 +34,19 @@
     (blake2s #x41 32)))
 
 (defstruct multihash-definition
+  "A multihash definition."
   name code length)
 
 (defparameter *multihash-definitions*
   (loop for (name code length) in *definitions*
      collect (make-multihash-definition :name name :code code :length length))
-  "multihash definitions mapped by digest symbol and multihash code")
+  "List of supported multihash definitions")
 
 (deftype multihash ()
   '(satisfies multihash-p))
 
 (defstruct decoded-multihash
+  "A multihash deconstructed into its parts."
   code name length digest)
 
 (defun app-code-p (code)
@@ -153,20 +155,24 @@ of (UNSIGNED-BYTE 8); for other implementations, SEQUENCE must be a
      finally (return chars)))
 
 (defun to-base58 (octets)
+  "Encode a multihash to a base58-encoded string."
   (declare (type multihash octets))
   (base58:encode (byte-array-to-chars octets)))
 
 (defun from-base58 (string)
+  "Decode a base58-encoded string into a multihash."
   (declare (type string string))
   (let ((multihash (chars-to-byte-array (base58:decode string))))
     (declare (type multihash multihash))
     multihash))
 
 (defun to-hex-string (octets)
+  "Encode a multihash to a hex string."
   (declare (type multihash octets))
   (ironclad:byte-array-to-hex-string octets))
 
 (defun from-hex-string (string)
+  "Decode a hex string into a multihash."
   (declare (type string string))
   (let ((multihash (ironclad:hex-string-to-byte-array string)))
     (declare (type multihash multihash))

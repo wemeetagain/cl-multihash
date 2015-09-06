@@ -24,7 +24,7 @@
 
 ;; decode multihash into component parts
 
-(multihash:decode (ironclad:hex-string-to-byte-array "11140beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33"))
+(multihash:decode (multihash:from-hex-string "11140beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33"))
 
 ;; => #S(CL-MULTIHASH::DECODED-MULTIHASH
 ;;   :CODE 17
@@ -40,7 +40,7 @@
 To run unit tests, run the following command:
 
 ```lisp
-(asdf:oos 'asdf:test-op :cl-multihash)
+(asdf:test-system :cl-multihash)
 ```
 
 ## License
