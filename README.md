@@ -35,6 +35,8 @@
 
 ```
 
+## [Documentation](https://wemeetagain.github.io/cl-multihash/overview.html)
+
 ## Testing
 
 To run unit tests, run the following command:
