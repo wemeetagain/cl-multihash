@@ -23,9 +23,23 @@
 ;;; For more information, see: https://github.com/jbenet/multihash
 ;;; -- Copied from https://github.com/jbenet/multihash
 
+;;; A multihash is a hash digest with 5 bytes of metadata prepended
+
 (in-package #:multihash)
 
+;;; We store the lookup list in these structs
+(defstruct multihash-definition
+  "A multihash definition."
+  ;;; name is an IRONCLAD symbol digest name which is used behind the scenes for
+  ;;; the multihash-* functions
+  (name nil :type symbol :read-only t)
+  ;;; code is the multihash function code
+  (code nil :type (unsigned-byte 8) :read-only t)
+  ;;; length is the typical length of the digest
+  (length nil :type fixnum :read-only t))
+
 (defparameter *definitions*
+  ;;; name function-code length
   '((sha1 #x11 20)
     (sha256 #x12 32)
     (sha512 #x13 64)
@@ -33,10 +47,7 @@
     (blake2b #x40 64)
     (blake2s #x41 32)))
 
-(defstruct multihash-definition
-  "A multihash definition."
-  name code length)
-
+;;; *multipash-definitions* is a list of all multihash-definitions
 (defparameter *multihash-definitions*
   (loop for (name code length) in *definitions*
      collect (make-multihash-definition :name name :code code :length length))
