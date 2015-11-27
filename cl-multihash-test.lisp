@@ -28,19 +28,19 @@
 ;; unit test variables
 
 (defvar test-codes
-  '((#x11 sha1)
-    (#x12 sha256)
-    (#x13 sha512)
-    (#x14 sha3)
-    (#x40 blake2b)
-    (#x41 blake2s)))
+  '((#x11 :sha1)
+    (#x12 :sha256)
+    (#x13 :sha512)
+    (#x14 :sha3)
+    (#x40 :blake2b)
+    (#x41 :blake2s)))
 
 (defvar test-cases
-  '(("0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33" #x11 sha1)
-    ("0beec7b5" #x11 sha1)
-    ("2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae" #x12 sha256)
-    ("2c26b46b" #x12 sha256)
-    ("0beec7b5ea3f0fdbc9" #x40 blake2b)))
+  '(("0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33" #x11 :sha1)
+    ("0beec7b5" #x11 :sha1)
+    ("2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae" #x12 :sha256)
+    ("2c26b46b" #x12 :sha256)
+    ("0beec7b5ea3f0fdbc9" #x40 :blake2b)))
 
 (defun create-test-multihash (hex code)
   (let ((bytes (hex-string-to-byte-array hex))
@@ -97,14 +97,14 @@
                  (let* ((new-bytes (concatenate '(vector (unsigned-byte 8) *)
                                                 new-bytes bytes))
                         (decoded (decode new-bytes)))
-                   (is (equal (decoded-multihash-code decoded) code)
+                   (is (= (decoded-multihash-code decoded) code)
                        "decoded code mismatch: ~X ~X"
                        (decoded-multihash-code decoded)
                        code)
                    (is (equal (decoded-multihash-name decoded) name)
                        "decoded name mismatch: ~S ~S"
-                       (decoded-multihash-name decoded)
-                       name)
+                       (symbol-name (decoded-multihash-name decoded))
+                       (symbol-name name))
                    (is (= (decoded-multihash-length decoded) (length bytes))
                        "decoded length mismatch: ~D ~D"
                        (decoded-multihash-length decoded)
@@ -117,15 +117,21 @@
 
 (test table
   (loop for (code name) in test-codes
-        do
-        (is (eq (multihash-definition-name (find code *multihash-definitions* :key #'multihash-definition-code)) name)
-            "Table mismatch: ~S ~S"
-            (multihash-definition-name (find code *multihash-definitions* :key #'multihash-definition-code))
-            name)
-        (is (= (multihash-definition-code (find name *multihash-definitions* :key #'multihash-definition-name)) code)
-            "Table mismatch: ~X ~X"
-            (multihash-definition-code (find name *multihash-definitions* :key #'multihash-definition-name))
-            code)))
+     do
+       (is (eq (multihash-definition-name
+		(find code *multihash-definitions* :key #'multihash-definition-code))
+	       name)
+	   "Table mismatch: ~S ~S"
+	   (multihash-definition-name
+	    (find code *multihash-definitions* :key #'multihash-definition-code))
+	   name)
+       (is (= (multihash-definition-code
+	       (find name *multihash-definitions* :key #'multihash-definition-name))
+	      code)
+	   "Table mismatch: ~X ~X"
+	   (multihash-definition-code
+	    (find name *multihash-definitions* :key #'multihash-definition-name))
+	   code)))
 
 (test valid-code
   (loop for code below #xff

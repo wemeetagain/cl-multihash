@@ -50,7 +50,7 @@
 ;;; *multipash-definitions* is a list of all multihash-definitions
 (defparameter *multihash-definitions*
   (loop for (name code length) in *definitions*
-     collect (make-multihash-definition :name name :code code :length length))
+     collect (make-multihash-definition :name (make-keyword name) :code code :length length))
   "List of supported multihash definitions")
 
 (deftype multihash ()

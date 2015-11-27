@@ -10,14 +10,14 @@
 ```lisp
 ;; return the multihash of a sequence
 
-(multihash:multihash-sequence 'multihash:sha256 (babel:string-to-octets "hello world"))
+(multihash:multihash-sequence :sha256 (babel:string-to-octets "hello world"))
 
 ;; => #(18 32 185 77 39 185 147 77 62 8 165 46 82 215 218 125 171 250 196 132
 ;; 239 227 122 83 128 238 144 136 247 172 226 239 205 233)
 
 ;; return the multihash of a file
 
-(multihash:multihash-file 'multihash:sha256 "test.txt")
+(multihash:multihash-file :sha256 "test.txt")
 
 ;; => #(18 32 170 220 25 85 192 48 247 35 233 216 158 217 212 134 180 238 245
 ;; 176 209 198 148 91 224 221 107 123 52 13 66 146 142 201)

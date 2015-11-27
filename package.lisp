@@ -3,6 +3,8 @@
 (defpackage #:cl-multihash
   (:nicknames :multihash)
   (:use #:cl)
+  (:import-from #:alexandria
+		#:make-keyword)
   (:import-from #:ironclad
 		#:digest-file
 		#:digest-stream

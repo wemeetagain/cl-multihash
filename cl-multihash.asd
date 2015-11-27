@@ -6,7 +6,7 @@
   :version "0.0.1"
   :author "Cayman Nava <caymannava@gmail.com>"
   :license "MIT"
-  :depends-on (:babel :cl-base58 :ironclad)
+  :depends-on (#:alexandria #:babel #:cl-base58 #:ironclad)
   :serial t
   :components ((:file "package")
                (:file "cl-multihash")))
