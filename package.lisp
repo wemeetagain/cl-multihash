@@ -4,7 +4,10 @@
   (:nicknames :multihash)
   (:use #:cl)
   (:import-from #:alexandria
-		#:make-keyword)
+		#:make-keyword
+		#:symbolicate)
+  (:import-from #:babel
+		#:string-to-octets)
   (:import-from #:ironclad
 		#:digest-file
 		#:digest-stream

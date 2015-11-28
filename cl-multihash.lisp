@@ -93,17 +93,27 @@ length is derived from SEQUENCE, rather than by the multihash definition.
 
 SEQUENCE must be a (SIMPLE-ARRAY (UNSIGNED-BYTE 8) (*))"
   (declare (type (simple-array (unsigned-byte 8)) sequence))
-  (typecase digest-name
-    (symbol
-     (let ((multihash-definition (find digest-name *multihash-definitions* :key #'multihash-definition-name)))
-       (cond
-         ((null multihash-definition) (error 'unsupported-digest digest-name))
-         ((> (length sequence) 127) (error "Length Not Supported: ~S" sequence))
-         (t (concatenate '(vector (unsigned-byte 8) *)
-                         (vector (multihash-definition-code multihash-definition) (length sequence))
-                         sequence)))))
-    (t
-     (error 'type-error :datum digest-name :expected-type 'symbol))))
+  (flet ((%encode (symbol sequence)
+           (let ((multihash-definition (find (make-keyword symbol) *multihash-definitions*
+                                             :key #'multihash-definition-name)))
+             (cond
+               ((null multihash-definition)
+                (error "Unsupported Digest: ~S" digest-name))
+               ((> (length sequence) 127)
+                (error "Length Not Supported: ~S" sequence))
+               (t (concatenate '(vector (unsigned-byte 8) *)
+                               (vector (multihash-definition-code multihash-definition) (length sequence))
+                               sequence))))))
+    (declare (inline %encode))
+    (typecase digest-name
+      (symbol (%encode (symbolicate digest-name) sequence))
+      (string (%encode (symbolicate (string-upcase digest-name)) sequence))
+      (integer (%encode (multihash-definition-code
+                         (find digest-name *multihash-definitions*
+                               :key #'multihash-definition-code))
+                        sequence))
+      (t
+       (error 'type-error :datum digest-name :expected-type 'symbol)))))
 
 (defun decode (sequence)
   "Decode a hash from a given multihash. Returns a DECODED-MULTIHASH struct or
