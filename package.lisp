@@ -1,4 +1,4 @@
-;;;; package.lisp
+(cl:in-package #:cl-user)
 
 (defpackage #:cl-multihash
   (:nicknames :multihash)

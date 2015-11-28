@@ -2,16 +2,16 @@
 ;;;;
 ;;;; multihash test suite
 
-(in-package :cl-user)
+(cl:in-package #:cl-user)
 
-(defpackage cl-multihash-tests
+(defpackage cl-multihash-test
   (:use :cl :multihash)
   (:import-from :5am def-suite fail in-suite is run! test)
   (:shadowing-import-from :multihash multihash-definition-code multihash-definition-name)
   (:shadowing-import-from :ironclad byte-array-to-hex-string hex-string-to-byte-array)
   (:export run-all-tests))
 
-(in-package :cl-multihash-tests)
+(in-package :cl-multihash-test)
 
 (def-suite cl-multihash)
 
