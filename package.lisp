@@ -30,6 +30,8 @@
    #:multihash-file
    #:multihash-stream
    #:multihash-sequence
+   #:%to-octets
+   #:multihash-object
    ;; utility functions
    #:app-code-p
    #:valid-code-p

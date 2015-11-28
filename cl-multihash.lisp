@@ -159,6 +159,23 @@ of (UNSIGNED-BYTE 8); for other implementations, SEQUENCE must be a
 (SIMPLE-ARRAY (UNSIGNED-BYTE 8) (*))."
   (encode digest-name (digest-sequence digest-name sequence)))
 
+;;; %to-octets returns the serialized form of an object
+;;; this is used to extend multihash-object
+(defgeneric %to-octets (object)
+  (:documentation "Returns a representation of the object as (SIMPLE-ARRAY (OCTET 8) *)"))
+
+(defgeneric multihash-object (digest object)
+  (:documentation "Returns a multihash of OBJECT"))
+
+(defmethod multihash-object (digest object)
+  (multihash-sequence digest (%to-octets object)))
+
+(defmethod multihash-object (digest (path pathname))
+  (multihash-file digest path))
+
+(defmethod %to-octets ((string string))
+  (string-to-octets string))
+
 ;;; extra utilities
 
 (defun chars-to-byte-array (chars)
