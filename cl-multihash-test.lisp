@@ -27,7 +27,7 @@
 
 ;; unit test variables
 
-(defvar test-codes
+(defparameter test-codes
   '((#x11 :sha1)
     (#x12 :sha256)
     (#x13 :sha512)
@@ -35,14 +35,14 @@
     (#x40 :blake2b)
     (#x41 :blake2s)))
 
-(defvar test-cases
+(defparameter test-cases
   '(("0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33" #x11 :sha1)
     ("0beec7b5" #x11 :sha1)
     ("2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae" #x12 :sha256)
     ("2c26b46b" #x12 :sha256)
     ("0beec7b5ea3f0fdbc9" #x40 :blake2b)))
 
-(defvar fail-multihashes
+(defparameter fail-multihashes
   '(;; invalid multihash code
     "7520d67100b7daece098c7e4fa1a360f1a2d8ec88ef6a2e6d168e6788e19f2806f72"
     ;; inconsistent length
@@ -52,18 +52,18 @@
     ;; too long
     "12121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212"))
 
-(defvar fail-encode
+(defparameter fail-encode
   `((#(1 2 3) ,(hex-string-to-byte-array "badcab")) ; bad digest-name type
     (:shaLOL ,(hex-string-to-byte-array "badcab")) ; unsupported digest
     (:sha256 ,(hex-string-to-byte-array "12121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212")))) ; too long
 
-(defvar equal-encode
+(defparameter equal-encode
   ;; these are three ways of saying the same thing
   `((:sha256 ,(hex-string-to-byte-array "badcab"))
     ("sha256" ,(hex-string-to-byte-array "badcab"))
     (#x12 ,(hex-string-to-byte-array "badcab"))))
 
-(defvar multihash-object-cases
+(defparameter multihash-object-cases
   `((:sha256 "lol" "QmNpFhQ4bJgKDrm8nh211ayWvNL21s7r1y63BRHqfgp7s9")))
 
 ;;; utility functions
