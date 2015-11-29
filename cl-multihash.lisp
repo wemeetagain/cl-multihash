@@ -108,7 +108,7 @@ SEQUENCE must be a (SIMPLE-ARRAY (UNSIGNED-BYTE 8) (*))"
     (typecase digest-name
       (symbol (%encode (symbolicate digest-name) sequence))
       (string (%encode (symbolicate (string-upcase digest-name)) sequence))
-      (integer (%encode (multihash-definition-code
+      (integer (%encode (multihash-definition-name
                          (find digest-name *multihash-definitions*
                                :key #'multihash-definition-code))
                         sequence))
