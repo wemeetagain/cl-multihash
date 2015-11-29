@@ -16,6 +16,7 @@
 		#:sha1 #:sha256 #:sha512)
   (:export
    #:*multihash-definitions*
+   #:multihash
    ;; hash name symbols
    #:sha1 #:sha256 #:sha512 #:sha3 #:blake2b #:blake2s
    ;; decoded-multihash slot accessors
