@@ -6,7 +6,7 @@
 
 (defpackage cl-multihash-test
   (:use :cl :multihash)
-  (:import-from :5am def-suite fail in-suite is run! test)
+  (:import-from :5am def-suite fail in-suite is run! is-false signals test)
   (:shadowing-import-from :multihash multihash-definition-code multihash-definition-name)
   (:shadowing-import-from :ironclad byte-array-to-hex-string hex-string-to-byte-array)
   (:export run-all-tests))
@@ -41,6 +41,32 @@
     ("2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae" #x12 :sha256)
     ("2c26b46b" #x12 :sha256)
     ("0beec7b5ea3f0fdbc9" #x40 :blake2b)))
+
+(defvar fail-multihashes
+  '(;; invalid multihash code
+    "7520d67100b7daece098c7e4fa1a360f1a2d8ec88ef6a2e6d168e6788e19f2806f72"
+    ;; inconsistent length
+    "1220d67100b7daece098c7e4fa1a360f1a2d8ec88ef6a2e6d168e6788e19f2806f72767770"
+    ;; too short
+    "12"
+    ;; too long
+    "12121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212"))
+
+(defvar fail-encode
+  `((#(1 2 3) ,(hex-string-to-byte-array "badcab")) ; bad digest-name type
+    (:shaLOL ,(hex-string-to-byte-array "badcab")) ; unsupported digest
+    (:sha256 ,(hex-string-to-byte-array "12121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212")))) ; too long
+
+(defvar equal-encode
+  ;; these are three ways of saying the same thing
+  `((:sha256 ,(hex-string-to-byte-array "badcab"))
+    ("sha256" ,(hex-string-to-byte-array "badcab"))
+    (#x12 ,(hex-string-to-byte-array "badcab"))))
+
+(defvar multihash-object-cases
+  `((:sha256 "lol" "QmNpFhQ4bJgKDrm8nh211ayWvNL21s7r1y63BRHqfgp7s9")))
+
+;;; utility functions
 
 (defun create-test-multihash (hex code)
   (let ((bytes (hex-string-to-byte-array hex))
@@ -173,3 +199,23 @@
   (loop for (b58 hex) in b58-hex-equiv
         do (is (string= (to-hex-string (from-base58 b58))
                         hex))))
+
+(test bad-hashes
+  (loop for badhex in fail-multihashes
+    do (is-false (multihash-p (hex-string-to-byte-array badhex)))))
+
+(test fail-to-encode
+  (loop for (digest seq) in fail-encode
+    do (signals error (encode digest seq))))
+
+(test equal-to-encode
+  (let ((m1 (apply #'encode (first equal-encode)))
+        (m2 (apply #'encode (second equal-encode)))
+        (m3 (apply #'encode (third equal-encode))))
+    (is (vector-equal m1 m2))
+    (is (vector-equal m2 m3))
+    (is (vector-equal m1 m3))))
+
+(test multihash-object
+  (loop for (digest obj result) in multihash-object-cases
+        do (is (equal result (to-base58 (multihash-object digest obj))))))
