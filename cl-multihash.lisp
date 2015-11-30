@@ -189,6 +189,16 @@ of (UNSIGNED-BYTE 8); for other implementations, SEQUENCE must be a
 (defmethod %to-octets ((string string))
   (string-to-octets string))
 
+;;; MULTIHASH is a high level, convenience function. It makes it that much
+;;; easier to create a multihash, and output it in some format.
+(defun multihash (object &key (digest-name :sha256) (output :octets))
+  "Returns the multihash of OBJECT, using DIGEST-NAME. The output format can be set with OUTPUT. OUTPUT can be one of the following: :OCTETS, :BASE58, or :HEX."
+  (let ((output-function (ecase output
+                           ((or :bin :bytes :octets) #'identity)
+                           ((or :base58 :b58) #'to-base58)
+                           ((or :hex :hex-string) #'to-hex-string))))
+    (funcall output-function (multihash-object digest-name object))))
+
 ;;; extra utilities
 
 (defun chars-to-byte-array (chars)

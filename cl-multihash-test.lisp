@@ -218,4 +218,4 @@
 
 (test multihash-object
   (loop for (digest obj result) in multihash-object-cases
-        do (is (equal result (to-base58 (multihash-object digest obj))))))
+        do (is (equal result (multihash obj :digest-name digest :output :base58)))))
