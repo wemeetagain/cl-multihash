@@ -173,6 +173,9 @@ of (UNSIGNED-BYTE 8); for other implementations, SEQUENCE must be a
 (defmethod multihash-object (digest (path pathname))
   (multihash-file digest path))
 
+(defmethod multihash-object (digest (stream stream))
+  (multihash-stream digest stream))
+
 (defmethod %to-octets ((string string))
   (string-to-octets string))
 
