@@ -57,47 +57,47 @@
 
 ### [CL-MULTIHASH](#CL-MULTIHASH) (MULTIHASH)
 
-* [special] [\**MULTIHASH-DEFINITIONS*\*](#CL-MULTIHASH:*MULTIHASH-DEFINITIONS*)
+* [special] [\***MULTIHASH-DEFINITIONS**\*](#CL-MULTIHASH:*MULTIHASH-DEFINITIONS*)
 
 List of supported multihash definitions
 
-* [generic function] [*MULTIHASH-OBJECT*](#CL-MULTIHASH:MULTIHASH-OBJECT) (DIGEST OBJECT)
+* [generic function] [**MULTIHASH-OBJECT**](#CL-MULTIHASH:MULTIHASH-OBJECT) (DIGEST OBJECT)
 
 Returns a multihash of OBJECT
 
-* [generic function] [*%TO-OCTETS*](#CL-MULTIHASH:%TO-OCTETS) (OBJECT)
+* [generic function] [**%TO-OCTETS**](#CL-MULTIHASH:%TO-OCTETS) (OBJECT)
 
 Returns a representation of the object as (SIMPLE-ARRAY (OCTET 8) *)
 
-* [structure] [*DECODED-MULTIHASH*](#CL-MULTIHASH:DECODED-MULTIHASH)
+* [structure] [**DECODED-MULTIHASH**](#CL-MULTIHASH:DECODED-MULTIHASH)
 
 A multihash deconstructed into its parts.
 
-* [accessor] [*DECODED-MULTIHASH-CODE*](#CL-MULTIHASH:DECODED-MULTIHASH-CODE) (INSTANCE)
+* [accessor] [**DECODED-MULTIHASH-CODE**](#CL-MULTIHASH:DECODED-MULTIHASH-CODE) (INSTANCE)
 
-* [accessor] [*DECODED-MULTIHASH-NAME*](#CL-MULTIHASH:DECODED-MULTIHASH-NAME) (INSTANCE)
+* [accessor] [**DECODED-MULTIHASH-NAME**](#CL-MULTIHASH:DECODED-MULTIHASH-NAME) (INSTANCE)
 
-* [accessor] [*DECODED-MULTIHASH-LENGTH*](#CL-MULTIHASH:DECODED-MULTIHASH-LENGTH) (INSTANCE)
+* [accessor] [**DECODED-MULTIHASH-LENGTH**](#CL-MULTIHASH:DECODED-MULTIHASH-LENGTH) (INSTANCE)
 
-* [accessor] [*DECODED-MULTIHASH-DIGEST*](#CL-MULTIHASH:DECODED-MULTIHASH-DIGEST) (INSTANCE)
+* [accessor] [**DECODED-MULTIHASH-DIGEST**](#CL-MULTIHASH:DECODED-MULTIHASH-DIGEST) (INSTANCE)
 
-* [function] [*MULTIHASH-P*](#CL-MULTIHASH:MULTIHASH-P) (SEQUENCE)
+* [function] [**MULTIHASH-P**](#CL-MULTIHASH:MULTIHASH-P) (SEQUENCE)
 
 Return T if SEQUENCE is a valid multihash, otherwise, return NIL.
 
 SEQUENCE must be a (SIMPLE-ARRAY (UNSIGNED-BYTE 8) (*))
 
-* [function] [*MULTIHASH-STREAM*](#CL-MULTIHASH:MULTIHASH-STREAM) (DIGEST-NAME STREAM)
+* [function] [**MULTIHASH-STREAM**](#CL-MULTIHASH:MULTIHASH-STREAM) (DIGEST-NAME STREAM)
 
 Return the multihash of the contents of STREAM using the algorithm
 DIGEST-NAME.  STREAM-ELEMENT-TYPE of STREAM should be (UNSIGNED-BYTE 8).
 
-* [function] [*MULTIHASH-FILE*](#CL-MULTIHASH:MULTIHASH-FILE) (DIGEST-NAME PATHNAME)
+* [function] [**MULTIHASH-FILE**](#CL-MULTIHASH:MULTIHASH-FILE) (DIGEST-NAME PATHNAME)
 
 Return the multihash of the contents of the file named by PATHNAME using
 the algorithm DIGEST-NAME.
 
-* [function] [*MULTIHASH-SEQUENCE*](#CL-MULTIHASH:MULTIHASH-SEQUENCE) (DIGEST-NAME SEQUENCE)
+* [function] [**MULTIHASH-SEQUENCE**](#CL-MULTIHASH:MULTIHASH-SEQUENCE) (DIGEST-NAME SEQUENCE)
 
 Return the multihash of the subsequence of SEQUENCE
 specified by START and END using the algorithm DIGEST-NAME.  For CMUCL
@@ -105,41 +105,41 @@ and SBCL, SEQUENCE can be any vector with an element-type
 of (UNSIGNED-BYTE 8); for other implementations, SEQUENCE must be a
 (SIMPLE-ARRAY (UNSIGNED-BYTE 8) (*)).
 
-* [function] [*FROM-BASE58*](#CL-MULTIHASH:FROM-BASE58) (STRING)
+* [function] [**FROM-BASE58**](#CL-MULTIHASH:FROM-BASE58) (STRING)
 
 Decode a base58-encoded string into a multihash.
 
-* [function] [*TO-BASE58*](#CL-MULTIHASH:TO-BASE58) (OCTETS)
+* [function] [**TO-BASE58**](#CL-MULTIHASH:TO-BASE58) (OCTETS)
 
 Encode a multihash to a base58-encoded string.
 
-* [function] [*FROM-HEX-STRING*](#CL-MULTIHASH:FROM-HEX-STRING) (STRING)
+* [function] [**FROM-HEX-STRING**](#CL-MULTIHASH:FROM-HEX-STRING) (STRING)
 
 Decode a hex string into a multihash.
 
-* [function] [*TO-HEX-STRING*](#CL-MULTIHASH:TO-HEX-STRING) (OCTETS)
+* [function] [**TO-HEX-STRING**](#CL-MULTIHASH:TO-HEX-STRING) (OCTETS)
 
 Encode a multihash to a hex string.
 
-* [function] [*ENCODE*](#CL-MULTIHASH:ENCODE) (DIGEST-NAME SEQUENCE)
+* [function] [**ENCODE**](#CL-MULTIHASH:ENCODE) (DIGEST-NAME SEQUENCE)
 
 Encode a hash digest along with the specified function code. Note: the
 length is derived from SEQUENCE, rather than by the multihash definition.
 
 SEQUENCE must be a (SIMPLE-ARRAY (UNSIGNED-BYTE 8) (*))
 
-* [function] [*DECODE*](#CL-MULTIHASH:DECODE) (SEQUENCE)
+* [function] [**DECODE**](#CL-MULTIHASH:DECODE) (SEQUENCE)
 
 Decode a hash from a given multihash. Returns a DECODED-MULTIHASH struct or
  errors.
 
 SEQUENCE must be a (SIMPLE-ARRAY (UNSIGNED-BYTE 8) (*))
 
-* [function] [*VALID-CODE-P*](#CL-MULTIHASH:VALID-CODE-P) (CODE)
+* [function] [**VALID-CODE-P**](#CL-MULTIHASH:VALID-CODE-P) (CODE)
 
 Checks whether a multihash code is valid.
 
-* [function] [*APP-CODE-P*](#CL-MULTIHASH:APP-CODE-P) (CODE)
+* [function] [**APP-CODE-P**](#CL-MULTIHASH:APP-CODE-P) (CODE)
 
 Checks whether a multihash code is part of the valid app range.
 
