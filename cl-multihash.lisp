@@ -178,7 +178,10 @@ of (UNSIGNED-BYTE 8); for other implementations, SEQUENCE must be a
   (:documentation "Returns a multihash of OBJECT."))
 
 (defmethod multihash-object (digest object)
-  (multihash-sequence digest (%to-octets object)))
+  (multihash-sequence digest
+                      (if (typep digest '(simple-array (unsigned-byte 8) *))
+                        object
+                        (%to-octets object))))
 
 (defmethod multihash-object (digest (path pathname))
   (multihash-file digest path))
