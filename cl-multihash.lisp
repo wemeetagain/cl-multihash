@@ -23,7 +23,7 @@
 ;;; For more information, see: https://github.com/jbenet/multihash
 ;;; -- Copied from https://github.com/jbenet/multihash
 
-;;; A multihash is a hash digest with 5 bytes of metadata prepended
+;;; tl;dr: A multihash is a hash digest with 5 bytes of metadata prepended
 
 (in-package #:multihash)
 
@@ -38,6 +38,10 @@
   ;;; length is the typical length of the digest
   (length nil :type fixnum :read-only t))
 
+;;; replicating table here to:
+;;; 1. avoid parsing the csv
+;;; 2. ensuring errors in the csv don't screw up code.
+;;; 3. changing a number has to happen in two places.
 (defparameter *definitions*
   ;;; name function-code length
   '((sha1 #x11 20)
@@ -47,7 +51,8 @@
     (blake2b #x40 64)
     (blake2s #x41 32)))
 
-;;; *multipash-definitions* is a list of all multihash-definitions
+;;; *MULTIHASH-DEFINITIONS* is a list of all multihash-definitions
+;;; It is used for all lookup purposes
 (defparameter *multihash-definitions*
   (loop for (name code length) in *definitions*
      collect (make-multihash-definition :name (make-keyword name) :code code :length length))
@@ -56,6 +61,7 @@
 (deftype multihash ()
   '(satisfies multihash-p))
 
+;;; DECODE returns a DECODED-MULTIHASH
 (defstruct decoded-multihash
   "A multihash deconstructed into its parts."
   code name length digest)
@@ -139,7 +145,7 @@ SEQUENCE must be a (SIMPLE-ARRAY (UNSIGNED-BYTE 8) (*))"
          (t
           decoded))))))
 
-;;; multihash high-level functions
+;;; multihash mid-level functions
 
 (defun multihash-file (digest-name pathname)
   "Return the multihash of the contents of the file named by PATHNAME using
@@ -159,13 +165,17 @@ of (UNSIGNED-BYTE 8); for other implementations, SEQUENCE must be a
 (SIMPLE-ARRAY (UNSIGNED-BYTE 8) (*))."
   (encode digest-name (digest-sequence digest-name sequence)))
 
+;;; multihash high-level functions
+
 ;;; %to-octets returns the serialized form of an object
 ;;; this is used to extend multihash-object
+;;; it is recommended that any methods return a multicodec rather than just
+;;; raw bytes in some unknown format
 (defgeneric %to-octets (object)
   (:documentation "Returns a representation of the object as (SIMPLE-ARRAY (OCTET 8) *)"))
 
 (defgeneric multihash-object (digest object)
-  (:documentation "Returns a multihash of OBJECT"))
+  (:documentation "Returns a multihash of OBJECT."))
 
 (defmethod multihash-object (digest object)
   (multihash-sequence digest (%to-octets object)))
