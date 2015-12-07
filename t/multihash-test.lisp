@@ -4,14 +4,28 @@
 
 (cl:in-package #:cl-user)
 
-(defpackage cl-multihash-test
-  (:use :cl :multihash)
-  (:import-from :5am def-suite fail in-suite is run! is-false signals test)
-  (:shadowing-import-from :multihash multihash-definition-code multihash-definition-name)
-  (:shadowing-import-from :ironclad byte-array-to-hex-string hex-string-to-byte-array)
-  (:export run-all-tests))
+(defpackage #:multihash-test
+  (:use #:cl
+        #:multihash.definitions
+        #:multihash.core
+        #:multihash.hashing
+        #:multihash.octets
+        #:multihash)
+  (:import-from #:5am
+                #:def-suite
+                #:fail
+                #:in-suite
+                #:is
+                #:run!
+                #:is-false
+                #:signals
+                #:test)
+  (:shadowing-import-from #:ironclad
+                          #:byte-array-to-hex-string
+                          #:hex-string-to-byte-array)
+  (:export #:run-all-tests))
 
-(in-package :cl-multihash-test)
+(in-package #:multihash-test)
 
 (def-suite cl-multihash)
 
@@ -20,7 +34,7 @@
 
 (in-suite cl-multihash)
 
-(defmethod asdf:perform ((o asdf:test-op) (c (eql (asdf:find-system :cl-multihash-test))))
+(defmethod asdf:perform ((o asdf:test-op) (c (eql (asdf:find-system :multihash-test))))
   (format t "Starting tests.~%")
   (run-all-tests)
   (format t "Tests finished.~%"))
@@ -202,7 +216,7 @@
 
 (test bad-hashes
   (loop for badhex in fail-multihashes
-    do (is-false (multihash-p (hex-string-to-byte-array badhex)))))
+    do (is-false (multihash-octets-p (hex-string-to-byte-array badhex)))))
 
 (test fail-to-encode
   (loop for (digest seq) in fail-encode
@@ -218,4 +232,4 @@
 
 (test multihash-object
   (loop for (digest obj result) in multihash-object-cases
-        do (is (equal result (multihash obj :digest-name digest :output :base58)))))
+        do (is (equal result (b58-string (multihash-object digest obj))))))
