@@ -30,8 +30,8 @@ SEQUENCE must be a (SIMPLE-ARRAY (UNSIGNED-BYTE 8) (*))"
                             (declare (ignore condition))
                             (return nil))))
       (let ((decoded (decode sequence)))
-        (if (valid-code-p (decoded-multihash-code decoded))
-            t)))))
+        (when (valid-code-p (decoded-multihash-code decoded))
+          t)))))
 
 ;;;
 
