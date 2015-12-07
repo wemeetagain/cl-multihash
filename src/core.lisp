@@ -76,7 +76,9 @@ SEQUENCE must be a (SIMPLE-ARRAY (UNSIGNED-BYTE 8) (*))"
                                :key #'multihash-definition-code))
                         sequence))
       (t
-       (error 'type-error :datum digest-name :expected-type 'symbol)))))
+       (error 'type-error
+              :datum digest-name
+              :expected-type '(symbol string integer))))))
 
 (defun decode (sequence)
   "Decode a hash from a given multihash. Returns a DECODED-MULTIHASH struct or
