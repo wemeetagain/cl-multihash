@@ -31,7 +31,7 @@ SEQUENCE must be a (SIMPLE-ARRAY (UNSIGNED-BYTE 8) (*))"
                             (return nil))))
       (let ((decoded (decode sequence)))
         (when (valid-code-p (decoded-multihash-code decoded))
-          t)))))
+          decoded)))))
 
 ;;;
 
