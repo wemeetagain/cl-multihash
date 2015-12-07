@@ -26,9 +26,9 @@ script:
                  (lambda (c h)
                    (declare (ignore c h))
                    (uiop:quit -1)))'
-       -e '(ql:quickload :cl-multihash)'
-       -e '(or (coveralls:with-coveralls (:exclude (list "cl-multihash-test.lisp"))
-                 (asdf:test-system :cl-multihash))
+       -e '(ql:quickload :multihash)'
+       -e '(or (coveralls:with-coveralls (:exclude (list "t"))
+                 (asdf:test-system :multihash))
                 (uiop:quit -1))'
 
 notifications:
