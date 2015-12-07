@@ -23,7 +23,18 @@
 ;;; DECODE returns a DECODED-MULTIHASH
 (defstruct decoded-multihash
   "A multihash deconstructed into its parts."
-  code name length digest)
+  (code nil
+    :type (unsigned-byte 8)
+    :read-only t)
+  (name nil
+    :type symbol
+    :read-only t)
+  (length nil
+    :type fixnum
+    :read-only t)
+  (digest nil
+    :type (simple-array (unsigned-byte 8) *)
+    :read-only t))
 
 (defun app-code-p (code)
   "Checks whether a multihash code is part of the valid app range."
