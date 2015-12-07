@@ -36,6 +36,18 @@
     :type (simple-array (unsigned-byte 8) *)
     :read-only t))
 
+(setf (documentation 'decoded-multihash-code 'function)
+      "Returns the integer code of the underlying hash algorithm.")
+
+(setf (documentation 'decoded-multihash-name 'function)
+      "Returns the name of the underlying hash algorithm.")
+
+(setf (documentation 'decoded-multihash-length 'function)
+      "Returns the length of the underlying digest.")
+
+(setf (documentation 'decoded-multihash-digest 'function)
+      "Returns the underlying digest.")
+
 (defun app-code-p (code)
   "Checks whether a multihash code is part of the valid app range."
   (and

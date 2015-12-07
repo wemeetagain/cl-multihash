@@ -14,7 +14,7 @@
 
 ;;; We store the lookup list in these structs
 (defstruct multihash-definition
-  "A multihash definition."
+  "A multihash definition, a single hash algorithm."
   ;;; name is an IRONCLAD symbol digest name which is used behind the scenes for
   ;;; the multihash-* functions
   (name nil :type symbol :read-only t)
@@ -22,6 +22,15 @@
   (code nil :type (unsigned-byte 8) :read-only t)
   ;;; length is the typical length of the digest
   (length nil :type fixnum :read-only t))
+
+(setf (documentation 'multihash-definition-name 'function)
+      "Returns the name of the hash algorithm.")
+
+(setf (documentation 'multihash-definition-code 'function)
+      "Returns the multihash-allocated code of the hash algorithm.")
+
+(setf (documentation 'multihash-definition-length 'function)
+      "Returns the multihash-allocated length of digest of the hash algorithm.")
 
 ;;; replicating table here to:
 ;;; 1. avoid parsing the csv

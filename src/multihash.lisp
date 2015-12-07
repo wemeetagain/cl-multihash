@@ -47,19 +47,27 @@
 
 ;;; tl;dr: A multihash is a hash digest with 5 bytes of metadata prepended
 
-(defgeneric octets (object))
+(defgeneric octets (object)
+  (:documentation "Returns the octets of the multihash."))
 (defgeneric (setf octets) (object octets))
 
-(defgeneric hex-string (object))
+(defgeneric hex-string (object)
+  (:documentation "Returns a hex-string representation of the multihash."))
 (defgeneric (setf hex-string) (object string))
 
-(defgeneric b58-string (object))
+(defgeneric b58-string (object)
+  (:documentation "Returns a base-58 string representation of the multihash.")
+  )
 (defgeneric (setf b58-string) (object string))
 
-(defgeneric hash-code (object))
-(defgeneric hash-name (object))
-(defgeneric hash-length (object))
-(defgeneric digest (object))
+(defgeneric hash-code (object)
+  (:documentation "Returns the digest algorithm code of the multihash."))
+(defgeneric hash-name (object)
+  (:documentation "Returns the digest algorithm name of the multihash."))
+(defgeneric hash-length (object)
+  (:documentation "Returns the digest length of the multihash."))
+(defgeneric digest (object)
+  (:documentation "Return the digest of the multihash."))
 
 ;;;
 
