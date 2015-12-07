@@ -7,6 +7,7 @@
                 #:make-keyword)
   (:export
     #:*multihash-definitions*
+    #:multihash-definition
     #:multihash-definition-code
     #:multihash-definition-name
     #:multihash-definition-length))
