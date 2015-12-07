@@ -8,14 +8,14 @@
   (:export #:multihash
            #:simple-multihash
            ;; accessors
-           #:multihash-octets
-           #:multihash-hex-string
-           #:multihash-b58-string
+           #:octets
+           #:hex-string
+           #:b58-string
            ;; readers
-           #:multihash-hash-code
-           #:multihash-hash-name
-           #:multihash-hash-length
-           #:multihash-digest
+           #:hash-code
+           #:hash-name
+           #:hash-length
+           #:digest
            ;; high level multihash creation
            #:multihash-object
            #:%to-octets))
@@ -47,19 +47,19 @@
 
 ;;; tl;dr: A multihash is a hash digest with 5 bytes of metadata prepended
 
-(defgeneric multihash-octets (object))
-(defgeneric (setf multihash-octets) (object octets))
+(defgeneric octets (object))
+(defgeneric (setf octets) (object octets))
 
-(defgeneric multihash-hex-string (object))
-(defgeneric (setf multihash-hex-string) (object string))
+(defgeneric hex-string (object))
+(defgeneric (setf hex-string) (object string))
 
-(defgeneric multihash-b58-string (object))
-(defgeneric (setf multihash-b58-string) (object string))
+(defgeneric b58-string (object))
+(defgeneric (setf b58-string) (object string))
 
-(defgeneric multihash-hash-code (object))
-(defgeneric multihash-hash-name (object))
-(defgeneric multihash-hash-length (object))
-(defgeneric multihash-digest (object))
+(defgeneric hash-code (object))
+(defgeneric hash-name (object))
+(defgeneric hash-length (object))
+(defgeneric digest (object))
 
 ;;;
 
@@ -68,65 +68,74 @@
 (defclass simple-multihash (multihash)
   ((%decoded
      :initform nil
-     :accessor multihash-decoded
+     :accessor decoded
      :type decoded-multihash)
    (%octets
      :initarg :octets
-     :accessor multihash-octets
+     :accessor octets
      :type multihash-octets)))
 
 (defmethod print-object ((object simple-multihash) stream)
   (print-unreadable-object (object stream :type t :identity t)
-    (format stream "~S" (multihash-b58-string object))))
+    (format stream "~S" (b58-string object))))
 
-(defmethod (setf multihash-octets) :after ((object simple-multihash) octets)
-  (setf (multihash-decode object) (decode (multihash-octets))))
+(defmethod (setf octets) :after ((object simple-multihash) octets)
+  (setf (decoded object)
+        (decode (octets object))))
 
-(defmethod multihash-hex-string ((object simple-multihash))
-  (to-hex-string (multihash-octets object)))
+(defmethod hex-string ((object simple-multihash))
+  (to-hex-string (octets object)))
 
-(defmethod (setf multihash-hex-string) ((object simple-multihash) (hex-string string))
-  (setf (multihash-octets object) (from-hex-string hex-string)))
+(defmethod (setf hex-string) ((object simple-multihash) (hex-string string))
+  (setf (octets object)
+        (from-hex-string hex-string)))
 
-(defmethod (setf multihash-b58-string) :after ((object simple-multihash) hex-string)
-  (setf (multihash-decode object) (decode (multihash-octets))))
+(defmethod (setf b58-string) :after ((object simple-multihash) hex-string)
+  (setf (decoded object)
+        (decode (octets object))))
 
-(defmethod multihash-b58-string ((object simple-multihash))
-  (to-base58 (multihash-octets object)))
+(defmethod b58-string ((object simple-multihash))
+  (to-base58 (octets object)))
 
-(defmethod (setf multihash-b58-string) ((object simple-multihash) (b58-string string))
-  (setf (multihash-octets object) (from-base58 b58-string)))
+(defmethod (setf b58-string) ((object simple-multihash) (b58-string string))
+  (setf (octets object)
+        (from-base58 b58-string)))
 
-(defmethod (setf multihash-b58-string) :after ((object simple-multihash) b58-string)
-  (setf (multihash-decode object) (decode (multihash-octets))))
+(defmethod (setf b58-string) :after ((object simple-multihash) b58-string)
+  (setf (decoded object)
+        (decode (octets object))))
 
-(defmethod multihash-hash-code ((object simple-multihash))
-  (decoded-multihash-code (multihash-decoded object)))
+(defmethod hash-code ((object simple-multihash))
+  (decoded-multihash-code (decoded object)))
 
-(defmethod multihash-hash-name ((object simple-multihash))
-  (decoded-multihash-name (multihash-decoded object)))
+(defmethod hash-name ((object simple-multihash))
+  (decoded-multihash-name (decoded object)))
 
-(defmethod multihash-hash-length ((object simple-multihash))
-  (decoded-multihash-length (multihash-decoded object)))
+(defmethod hash-length ((object simple-multihash))
+  (decoded-multihash-length (decoded object)))
 
-(defmethod multihash-digest ((object simple-multihash))
-  (decoded-multihash-digest (multihash-decoded object)))
+(defmethod digest ((object simple-multihash))
+  (decoded-multihash-digest (decoded object)))
 
-(defmethod multihash-hash-code :before ((object simple-multihash))
-  (when (null (multihash-decoded object))
-    (setf (multihash-decoded object) (decode (multihash-octets object)))))
+(defmethod hash-code :before ((object simple-multihash))
+  (when (null (decoded object))
+    (setf (decoded object)
+          (decode (octets object)))))
 
-(defmethod multihash-hash-name :before ((object simple-multihash))
-  (when (null (multihash-decoded object))
-    (setf (multihash-decoded object) (decode (multihash-octets object)))))
+(defmethod hash-name :before ((object simple-multihash))
+  (when (null (decoded object))
+    (setf (decoded object)
+          (decode (octets object)))))
 
-(defmethod multihash-hash-length :before ((object simple-multihash))
-  (when (null (multihash-decoded object))
-    (setf (multihash-decoded object) (decode (multihash-octets object)))))
+(defmethod hash-length :before ((object simple-multihash))
+  (when (null (decoded object))
+    (setf (decoded object)
+          (decode (octets object)))))
 
-(defmethod multihash-digest :before ((object simple-multihash))
-  (when (null (multihash-decoded object))
-    (setf (multihash-decoded object) (decode (multihash-octets object)))))
+(defmethod digest :before ((object simple-multihash))
+  (when (null (decoded object))
+    (setf (decoded object)
+          (decode (octets object)))))
 
 ;;;
 
