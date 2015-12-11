@@ -98,20 +98,10 @@ SEQUENCE must be a (SIMPLE-ARRAY (UNSIGNED-BYTE 8) (*))"
 
 SEQUENCE must be a (SIMPLE-ARRAY (UNSIGNED-BYTE 8) (*))"
   (declare (type (simple-array (unsigned-byte 8)) sequence))
-  (cond
-    ((< (length sequence) 3) (error "Too Short: ~S" sequence))
-    ((> (length sequence) 129) (error "Too Long: ~S" sequence))
-    (t
-     (let ((decoded
-	    (make-decoded-multihash
-	     :code (aref sequence 0)
-	     :name (multihash-definition-name (find (aref sequence 0) *multihash-definitions* :key #'multihash-definition-code))
-	     :length (aref sequence 1)
-	     :digest (subseq sequence 2))))
-       (cond
-         ((not (= (length (decoded-multihash-digest decoded)) (decoded-multihash-length decoded)))
-          (error "Inconsistent Length: ~S, length ~D should equal ~D" decoded (length (decoded-multihash-digest decoded)) (decoded-multihash-length decoded)))
-         ((not (valid-code-p (decoded-multihash-code decoded)))
-          (error "Invalid Multihash Code: ~S" decoded))
-         (t
-          decoded))))))
+  (if (multihash-octets-p sequence)
+    (make-decoded-multihash
+      :code (aref sequence 0)
+	  :name (multihash-definition-name (find (aref sequence 0) *multihash-definitions* :key #'multihash-definition-code))
+	  :length (aref sequence 1)
+	  :digest (subseq sequence 2))
+    (error "Invalid multihash octets: ~S" sequence)))

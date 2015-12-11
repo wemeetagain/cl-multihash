@@ -21,17 +21,17 @@
   '(satisfies multihash-octets-p))
 
 (defun multihash-octets-p (sequence)
-  "Return T if SEQUENCE is a valid multihash, otherwise, return NIL.
+  "Return T if SEQUENCE is a valid multihash octet array, otherwise return NIL.
 
 SEQUENCE must be a (SIMPLE-ARRAY (UNSIGNED-BYTE 8) (*))"
-  (declare (type (simple-array (unsigned-byte 8)) sequence))
-  (block nil
-    (handler-bind ((error (lambda (condition)
-                            (declare (ignore condition))
-                            (return nil))))
-      (let ((decoded (decode sequence)))
-        (when (valid-code-p (decoded-multihash-code decoded))
-          decoded)))))
+  (and (typep (simple-array (unsigned-byte 8)) sequence)
+       ;;; check length between 3 and 128, inclusively
+       (>= (length sequence) 3)
+       (<= (length sequence) 128)
+       ;;; check digest length matches multihash length byte
+       (= (- (length sequence) 2) (aref sequence 1))
+       ;;; check multihash code byte validity
+       (valid-code-p (aref sequence 0))))
 
 ;;;
 
