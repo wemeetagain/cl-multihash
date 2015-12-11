@@ -3,29 +3,12 @@
 (cl:in-package #:cl-user)
 (defpackage #:multihash.util
   (:use #:cl #:multihash.core)
-  (:import-from #:babel
-                #:string-to-octets)
   (:export
-    ;; generic
-    #:%to-octets
-    ;; utilities
     #:from-base58
     #:to-base58
     #:from-hex-string
     #:to-hex-string))
 (in-package #:multihash.util)
-
-;;;
-
-;;; %to-octets returns the serialized form of an object
-;;; this is used to extend multihash-object
-;;; it is recommended that any methods return a multicodec rather than just
-;;; raw bytes in some unknown format
-(defgeneric %to-octets (object)
-    (:documentation "Returns a representation of the object as (SIMPLE-ARRAY (OCTET 8) *)"))
-
-(defmethod %to-octets ((string string))
-    (string-to-octets string))
 
 ;;; multihash-octets utilities
 

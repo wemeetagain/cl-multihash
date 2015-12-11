@@ -5,6 +5,8 @@
         #:multihash.core
         #:multihash.hashing
         #:multihash.util)
+  (:import-from #:babel
+                #:string-to-octets)
   (:export #:multihash
            #:simple-multihash
            ;; accessors
@@ -146,6 +148,16 @@
           (decode (octets object)))))
 
 ;;;
+
+;;; %to-octets returns the serialized form of an object
+;;; this is used to extend multihash-object
+;;; it is recommended that any methods return a multicodec rather than just
+;;; raw bytes in some unknown format
+(defgeneric %to-octets (object)
+    (:documentation "Returns a representation of the object as (SIMPLE-ARRAY (OCTET 8) *)"))
+
+(defmethod %to-octets ((string string))
+    (string-to-octets string))
 
 (defgeneric multihash-object (digest object)
     (:documentation "Returns a multihash of OBJECT."))
