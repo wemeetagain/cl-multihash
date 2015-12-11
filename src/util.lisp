@@ -1,7 +1,7 @@
 ;;;; -*- mode: lisp; indent-tabs-mode: nil -*-
 
 (cl:in-package #:cl-user)
-(defpackage #:multihash.octets
+(defpackage #:multihash.util
   (:use #:cl #:multihash.core)
   (:import-from #:babel
                 #:string-to-octets)
@@ -13,7 +13,7 @@
     #:to-base58
     #:from-hex-string
     #:to-hex-string))
-(in-package #:multihash.octets)
+(in-package #:multihash.util)
 
 ;;;
 

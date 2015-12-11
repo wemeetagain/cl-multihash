@@ -13,7 +13,7 @@
                 ((:file "definitions")
                  (:file "core")
                  (:file "hashing")
-                 (:file "octets")
+                 (:file "util")
                  (:file "multihash"))))
   :long-description #.(uiop:read-file-string
 		       (uiop:subpathname *load-pathname* "README.md"))

@@ -4,7 +4,7 @@
   (:use #:cl
         #:multihash.core
         #:multihash.hashing
-        #:multihash.octets)
+        #:multihash.util)
   (:export #:multihash
            #:simple-multihash
            ;; accessors
