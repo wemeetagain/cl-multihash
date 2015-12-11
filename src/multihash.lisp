@@ -47,7 +47,7 @@
 ;;; For more information, see: https://github.com/jbenet/multihash
 ;;; -- Copied from https://github.com/jbenet/multihash
 
-;;; tl;dr: A multihash is a hash digest with 5 bytes of metadata prepended
+;;; tl;dr: A multihash is a hash digest with 2 bytes of metadata prepended
 
 (defgeneric octets (object)
   (:documentation "Returns the octets of the multihash."))
