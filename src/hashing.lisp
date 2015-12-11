@@ -14,6 +14,9 @@
     #:multihash-sequence))
 (in-package #:multihash.hashing)
 
+;;; These functions mirror the equivalent DIGEST-* functions from IRONCLAD
+;;; They create a hash and encode it as a multihash-octets
+
 (defun multihash-file (digest-name pathname)
   "Return the multihash of the contents of the file named by PATHNAME using
 the algorithm DIGEST-NAME."
