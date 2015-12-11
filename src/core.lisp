@@ -7,6 +7,9 @@
                 #:make-keyword
                 #:symbolicate)
   (:export
+    ;; core type
+    #:multihash-octets
+    #:multihash-octets-p
     ;; core functions
     #:encode #:decode
     ;; decoded-multihash struct and accessors
@@ -19,6 +22,22 @@
     #:app-code-p
     #:valid-code-p))
 (in-package #:multihash.core)
+
+(deftype multihash-octets ()
+  '(satisfies multihash-octets-p))
+
+(defun multihash-octets-p (sequence)
+  "Return T if SEQUENCE is a valid multihash octet array, otherwise return NIL.
+
+SEQUENCE must be a (SIMPLE-ARRAY (UNSIGNED-BYTE 8) (*))"
+  (and (typep sequence '(simple-array (unsigned-byte 8)))
+       ;;; check length between 3 and 128, inclusively
+       (>= (length sequence) 3)
+       (<= (length sequence) 128)
+       ;;; check digest length matches multihash length byte
+       (= (- (length sequence) 2) (aref sequence 1))
+       ;;; check multihash code byte validity
+       (valid-code-p (aref sequence 0))))
 
 ;;; DECODE returns a DECODED-MULTIHASH
 (defstruct decoded-multihash

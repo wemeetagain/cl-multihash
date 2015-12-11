@@ -6,8 +6,6 @@
   (:import-from #:babel
                 #:string-to-octets)
   (:export
-    #:multihash-octets
-    #:multihash-octets-p
     ;; generic
     #:%to-octets
     ;; utilities
@@ -16,22 +14,6 @@
     #:from-hex-string
     #:to-hex-string))
 (in-package #:multihash.octets)
-
-(deftype multihash-octets ()
-  '(satisfies multihash-octets-p))
-
-(defun multihash-octets-p (sequence)
-  "Return T if SEQUENCE is a valid multihash octet array, otherwise return NIL.
-
-SEQUENCE must be a (SIMPLE-ARRAY (UNSIGNED-BYTE 8) (*))"
-  (and (typep (simple-array (unsigned-byte 8)) sequence)
-       ;;; check length between 3 and 128, inclusively
-       (>= (length sequence) 3)
-       (<= (length sequence) 128)
-       ;;; check digest length matches multihash length byte
-       (= (- (length sequence) 2) (aref sequence 1))
-       ;;; check multihash code byte validity
-       (valid-code-p (aref sequence 0))))
 
 ;;;
 
