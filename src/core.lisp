@@ -12,10 +12,7 @@
     #:multihash-octets-p
     ;; core functions
     #:%code #:%name #:%length #:%digest
-    #:encode #:decode
-    ;; core utility functions
-    #:app-code-p
-    #:valid-code-p))
+    #:encode #:decode))
 (in-package #:multihash.core)
 
 (deftype multihash-octets ()
@@ -33,20 +30,6 @@ SEQUENCE must be a (SIMPLE-ARRAY (UNSIGNED-BYTE 8) (*))"
        (= (- (length sequence) 2) (%length sequence))
        ;;; check multihash code byte validity
        (valid-code-p (%code sequence))))
-
-(defun app-code-p (code)
-  "Checks whether a multihash code is part of the valid app range."
-  (and
-   (integerp code)
-   (>= code 0)
-   (< code #x10)))
-
-(defun valid-code-p (code)
-  "Checks whether a multihash code is valid."
-  (cond
-    ((app-code-p code) t)
-    ((member code *multihash-definitions* :key #'multihash-definition-code) t)
-    (t nil)))
 
 (defun %code (mhash-octets)
   (aref mhash-octets 0))

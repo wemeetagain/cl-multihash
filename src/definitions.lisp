@@ -10,7 +10,9 @@
     #:multihash-definition
     #:multihash-definition-code
     #:multihash-definition-name
-    #:multihash-definition-length))
+    #:multihash-definition-length
+    #:app-code-p
+    #:valid-code-p))
 (in-package #:multihash.definitions)
 
 ;;; We store the lookup list in these structs
@@ -52,3 +54,17 @@
   (loop for (name code length) in *definitions*
      collect (make-multihash-definition :name (make-keyword name) :code code :length length))
   "List of supported multihash definitions")
+
+(defun app-code-p (code)
+  "Checks whether a multihash code is part of the valid app range."
+  (and
+   (integerp code)
+   (>= code 0)
+   (< code #x10)))
+
+(defun valid-code-p (code)
+  "Checks whether a multihash code is valid."
+  (cond
+    ((app-code-p code) t)
+    ((member code *multihash-definitions* :key #'multihash-definition-code) t)
+    (t nil)))
