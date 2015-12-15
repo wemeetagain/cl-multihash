@@ -38,17 +38,17 @@ SEQUENCE must be a (SIMPLE-ARRAY (UNSIGNED-BYTE 8) (*))"
   (setf (aref mhash-octets 0) (the (unsigned-byte 8) code)))
 
 (defun %name (mhash-octets)
-  (multihash-definition-name
-    (find (%code mhash-octets) *multihash-definitions*
-          :key #'multihash-definition-code)))
+  (definition-name
+    (find (%code mhash-octets) *definitions*
+          :key #'definition-code)))
 
 (defun (setf %name) (name mhash-octets)
-  (let ((definition (find name *multihash-definitions*
-                          :key #'multihash-definition-name)))
+  (let ((definition (find name *definitions*
+                          :key #'definition-name)))
     (if (null definition)
       (error "No multihash definition found: ~S" name)
       (setf (%code mhash-octets)
-             (multihash-definition-code definition)))))
+             (definition-code definition)))))
 
 (defun %length (mhash-octets)
   (aref mhash-octets 1))
@@ -81,10 +81,10 @@ SEQUENCE must be a (SIMPLE-ARRAY (UNSIGNED-BYTE 8) (*))"
                                  (+ (length sequence) 2)
                                  :element-type '(unsigned-byte 8))))
              (setf (%code mhash-octets)
-                   (multihash-definition-code
+                   (definition-code
                      (find
-                       (make-keyword symbol) *multihash-definitions*
-                       :key #'multihash-definition-name)))
+                       (make-keyword symbol) *definitions*
+                       :key #'definition-name)))
              (setf (%digest mhash-octets)
                    sequence)
              mhash-octets)))
@@ -92,9 +92,9 @@ SEQUENCE must be a (SIMPLE-ARRAY (UNSIGNED-BYTE 8) (*))"
     (typecase digest-name
       (symbol (%encode (symbolicate digest-name) sequence))
       (string (%encode (symbolicate (string-upcase digest-name)) sequence))
-      (integer (%encode (multihash-definition-name
-                         (find digest-name *multihash-definitions*
-                               :key #'multihash-definition-code))
+      (integer (%encode (definition-name
+                         (find digest-name *definitions*
+                               :key #'definition-code))
                         sequence))
       (t
        (error 'type-error
