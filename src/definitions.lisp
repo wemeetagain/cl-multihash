@@ -3,8 +3,6 @@
 (cl:in-package #:cl-user)
 (defpackage #:multihash.definitions
   (:use #:cl)
-  (:import-from #:alexandria
-                #:make-keyword)
   (:export
     #:*definitions*
     #:definition
@@ -41,19 +39,19 @@
 ;;; 3. changing a number has to happen in two places.
 (defparameter *definition-list*
   ;;; name function-code length
-  '((sha1 #x11 20)
-    (sha256 #x12 32)
-    (sha512 #x13 64)
-    (sha3 #x14 64)
-    (blake2b #x40 64)
-    (blake2s #x41 32)))
+  '((:sha1 #x11 20)
+    (:sha256 #x12 32)
+    (:sha512 #x13 64)
+    (:sha3 #x14 64)
+    (:blake2b #x40 64)
+    (:blake2s #x41 32)))
 
 ;;; *DEFINITIONS* is a list of all known multihash definitions
 ;;; It is used for all lookup purposes
 (defparameter *definitions*
   (loop for (name code length) in *definition-list*
      collect (make-definition
-               :name (make-keyword name)
+               :name name
                :code code
                :length length))
   "List of supported multihash definitions")
