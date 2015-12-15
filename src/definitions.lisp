@@ -64,7 +64,7 @@
 
 (defun valid-code-p (code)
   "Checks whether a multihash code is valid."
-  (cond
-    ((app-code-p code) t)
-    ((member code *multihash-definitions* :key #'multihash-definition-code) t)
-    (t nil)))
+  (or
+    (app-code-p code)
+    (member code *multihash-definitions*
+            :key #'multihash-definition-code)))
