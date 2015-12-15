@@ -9,6 +9,7 @@
     #:definition-code
     #:definition-name
     #:definition-length
+    #:make-definition
     #:app-code-p
     #:valid-code-p))
 (in-package #:multihash.definitions)
