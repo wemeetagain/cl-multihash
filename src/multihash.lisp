@@ -48,6 +48,8 @@
 
 ;;; tl;dr: A multihash is a hash digest with 2 bytes of metadata prepended, a code and length
 
+;;; multihash interface
+
 (defgeneric hash-code (object)
   (:documentation "Returns the hash algorithm code of the multihash."))
 
@@ -72,19 +74,19 @@
   (:documentation "Returns the multihash as a (SIMPLE-ARRAY (UNSIGNED-BYTE 8) *)."))
 
 (defgeneric (setf octets) (octets multihash)
-  (:documentation ""))
+  (:documentation "Set a multihash as a (SIMPLE-ARRAY (UNSIGNED-BYTE 8) *)."))
 
 (defgeneric hex-string (object)
   (:documentation "Returns a hex-string representation of the multihash."))
 
 (defgeneric (setf hex-string) (string multihash)
-  (:documentation ""))
+  (:documentation "Set a multihash as a hex-string."))
 
 (defgeneric b58-string (object)
   (:documentation "Returns a base-58 string representation of the multihash."))
 
 (defgeneric (setf b58-string) (string multihash)
-  (:documentation ""))
+  (:documentation "Set a multihash as a base-58 string."))
 
 ;;;
 
@@ -118,7 +120,7 @@
 (defmethod (setf digest) (digest (object simple-multihash))
   (setf (%digest (octets object)) digest))
 
-;;;
+;;; formatting methods
 
 (defmethod hex-string ((object simple-multihash))
   (to-hex-string (octets object)))
@@ -133,7 +135,8 @@
 (defmethod (setf b58-string) ((b58-string string) (object simple-multihash))
   (setf (octets object)
         (from-base58 b58-string)))
-;;;
+
+;;; multihash creation
 
 ;;; %to-octets returns the serialized form of an object
 ;;; this is used to extend multihash-object
