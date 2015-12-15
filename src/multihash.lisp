@@ -9,15 +9,14 @@
                 #:string-to-octets)
   (:export #:multihash
            #:simple-multihash
-           ;; accessors
+           ;; multihash interface
+           #:hash-code
+           #:hash-name
+           #:digest
+           ;; formatting accessors
            #:octets
            #:hex-string
            #:b58-string
-           ;; readers
-           #:hash-code
-           #:hash-name
-           #:hash-length
-           #:digest
            ;; high level multihash creation
            #:multihash-object
            #:%to-octets))
@@ -47,106 +46,93 @@
 ;;; For more information, see: https://github.com/jbenet/multihash
 ;;; -- Copied from https://github.com/jbenet/multihash
 
-;;; tl;dr: A multihash is a hash digest with 2 bytes of metadata prepended
+;;; tl;dr: A multihash is a hash digest with 2 bytes of metadata prepended, a code and length
+
+(defgeneric hash-code (object)
+  (:documentation "Returns the hash algorithm code of the multihash."))
+
+(defgeneric (setf hash-code) (code multihash)
+  (:documentation "Sets the hash algorithm code of the multihash."))
+
+(defgeneric hash-name (object)
+  (:documentation "Returns the hash algorithm name of the multihash."))
+
+(defgeneric (setf hash-name) (name multihash)
+  (:documentation "Sets the hash algorithm of the multihash."))
+
+(defgeneric digest (object)
+  (:documentation "Return the digest of the multihash."))
+
+(defgeneric (setf digest) (digest multihash)
+  (:documentation "Sets the digest of the multihash.") )
+
+;;; input/output common representations
 
 (defgeneric octets (object)
-  (:documentation "Returns the octets of the multihash."))
-(defgeneric (setf octets) (object octets))
+  (:documentation "Returns the multihash as a (SIMPLE-ARRAY (UNSIGNED-BYTE 8) *)."))
+
+(defgeneric (setf octets) (octets multihash)
+  (:documentation ""))
 
 (defgeneric hex-string (object)
   (:documentation "Returns a hex-string representation of the multihash."))
-(defgeneric (setf hex-string) (object string))
+
+(defgeneric (setf hex-string) (string multihash)
+  (:documentation ""))
 
 (defgeneric b58-string (object)
-  (:documentation "Returns a base-58 string representation of the multihash.")
-  )
-(defgeneric (setf b58-string) (object string))
+  (:documentation "Returns a base-58 string representation of the multihash."))
 
-(defgeneric hash-code (object)
-  (:documentation "Returns the digest algorithm code of the multihash."))
-(defgeneric hash-name (object)
-  (:documentation "Returns the digest algorithm name of the multihash."))
-(defgeneric hash-length (object)
-  (:documentation "Returns the digest length of the multihash."))
-(defgeneric digest (object)
-  (:documentation "Return the digest of the multihash."))
+(defgeneric (setf b58-string) (string multihash)
+  (:documentation ""))
 
 ;;;
 
 (defclass multihash () ())
 
 (defclass simple-multihash (multihash)
-  ((%decoded
-     :initform nil
-     :accessor decoded
-     :type decoded-multihash)
-   (%octets
+  ((%octets
      :initarg :octets
      :accessor octets
      :type multihash-octets)))
 
 (defmethod print-object ((object simple-multihash) stream)
-  (print-unreadable-object (object stream :type t :identity t)
+  (print-unreadable-object (object stream :type t :identity nil)
     (format stream "~S" (b58-string object))))
 
-(defmethod (setf octets) :after ((object simple-multihash) octets)
-  (setf (decoded object)
-        (decode (octets object))))
+(defmethod hash-code ((object simple-multihash))
+  (%code (octets object)))
+
+(defmethod (setf hash-code) (code (object simple-multihash))
+  (setf (%code (octets object)) code))
+
+(defmethod hash-name ((object simple-multihash))
+  (%name (octets object)))
+
+(defmethod (setf hash-name) (name (object simple-multihash))
+  (setf (%name (octets object)) name))
+
+(defmethod digest ((object simple-multihash))
+  (%digest (octets object)))
+
+(defmethod (setf digest) (digest (object simple-multihash))
+  (setf (%digest (octets object)) digest))
+
+;;;
 
 (defmethod hex-string ((object simple-multihash))
   (to-hex-string (octets object)))
 
-(defmethod (setf hex-string) ((object simple-multihash) (hex-string string))
+(defmethod (setf hex-string) ((hex-string string) (object simple-multihash))
   (setf (octets object)
         (from-hex-string hex-string)))
-
-(defmethod (setf b58-string) :after ((object simple-multihash) hex-string)
-  (setf (decoded object)
-        (decode (octets object))))
 
 (defmethod b58-string ((object simple-multihash))
   (to-base58 (octets object)))
 
-(defmethod (setf b58-string) ((object simple-multihash) (b58-string string))
+(defmethod (setf b58-string) ((b58-string string) (object simple-multihash))
   (setf (octets object)
         (from-base58 b58-string)))
-
-(defmethod (setf b58-string) :after ((object simple-multihash) b58-string)
-  (setf (decoded object)
-        (decode (octets object))))
-
-(defmethod hash-code ((object simple-multihash))
-  (decoded-multihash-code (decoded object)))
-
-(defmethod hash-name ((object simple-multihash))
-  (decoded-multihash-name (decoded object)))
-
-(defmethod hash-length ((object simple-multihash))
-  (decoded-multihash-length (decoded object)))
-
-(defmethod digest ((object simple-multihash))
-  (decoded-multihash-digest (decoded object)))
-
-(defmethod hash-code :before ((object simple-multihash))
-  (when (null (decoded object))
-    (setf (decoded object)
-          (decode (octets object)))))
-
-(defmethod hash-name :before ((object simple-multihash))
-  (when (null (decoded object))
-    (setf (decoded object)
-          (decode (octets object)))))
-
-(defmethod hash-length :before ((object simple-multihash))
-  (when (null (decoded object))
-    (setf (decoded object)
-          (decode (octets object)))))
-
-(defmethod digest :before ((object simple-multihash))
-  (when (null (decoded object))
-    (setf (decoded object)
-          (decode (octets object)))))
-
 ;;;
 
 ;;; %to-octets returns the serialized form of an object
