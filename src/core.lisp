@@ -59,8 +59,8 @@ SEQUENCE must be a (SIMPLE-ARRAY (UNSIGNED-BYTE 8) (*))"
     (error "Invalid length: ~D" length)
     (progn
       (setf (aref mhash-octets 1) (the (unsigned-byte 8) length))
-      (unless (= (- (length mhash-octets) 2) length)
-        (adjust-array mhash-octets (+ length 2))))))
+      (unless (= (length mhash-octets) (+ length 2))
+        (setf mhash-octets (adjust-array mhash-octets (+ length 2)))))))
 
 (defun %digest (mhash-octets)
   (subseq mhash-octets 2))
