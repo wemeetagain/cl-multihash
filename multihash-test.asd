@@ -3,8 +3,11 @@
 (defsystem #:multihash-test
   :name "multihash tests"
   :description "Unit tests for multihash"
-  :depends-on (:multihash :fiveam)
+  :depends-on (#:multihash #:prove)
+  :defsystem-depends-on (#:prove-asdf)
   :components ((:module "t"
                 :serial t
                 :components
-                ((:file "multihash-test")))))
+                ((:test-file "multihash-test"))))
+  :perform (test-op :after (op c)
+		    (funcall (intern #.(string :run) :prove) c)))

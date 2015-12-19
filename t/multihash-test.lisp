@@ -1,94 +1,21 @@
-;;;; cl-multihash-test.lisp
-;;;;
-;;;; multihash test suite
-
 (cl:in-package #:cl-user)
 
 (defpackage #:multihash-test
-  (:use #:cl
-        #:multihash.definitions
-        #:multihash.core
-        #:multihash.hashing
-        #:multihash.octets
-        #:multihash)
-  (:import-from #:5am
-                #:def-suite
-                #:fail
-                #:in-suite
-                #:is
-                #:run!
-                #:is-false
-                #:signals
-                #:test)
-  (:shadowing-import-from #:ironclad
-                          #:byte-array-to-hex-string
-                          #:hex-string-to-byte-array)
-  (:export #:run-all-tests))
+  (:use #:cl)
+  (:import-from #:ironclad
+		#:hex-string-to-byte-array)
+  (:import-from #:prove
+		#:diag
+		#:finalize
+		#:is
+		#:isnt
+		#:plan
+		#:subtest)
+  (:export))
 
 (in-package #:multihash-test)
 
-(def-suite cl-multihash)
-
-(defun run-all-tests ()
-  (run! 'cl-multihash))
-
-(in-suite cl-multihash)
-
-(defmethod asdf:perform ((o asdf:test-op) (c (eql (asdf:find-system :multihash-test))))
-  (format t "Starting tests.~%")
-  (run-all-tests)
-  (format t "Tests finished.~%"))
-
-;; unit test variables
-
-(defparameter test-codes
-  '((#x11 :sha1)
-    (#x12 :sha256)
-    (#x13 :sha512)
-    (#x14 :sha3)
-    (#x40 :blake2b)
-    (#x41 :blake2s)))
-
-(defparameter test-cases
-  '(("0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33" #x11 :sha1)
-    ("0beec7b5" #x11 :sha1)
-    ("2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae" #x12 :sha256)
-    ("2c26b46b" #x12 :sha256)
-    ("0beec7b5ea3f0fdbc9" #x40 :blake2b)))
-
-(defparameter fail-multihashes
-  '(;; invalid multihash code
-    "7520d67100b7daece098c7e4fa1a360f1a2d8ec88ef6a2e6d168e6788e19f2806f72"
-    ;; inconsistent length
-    "1220d67100b7daece098c7e4fa1a360f1a2d8ec88ef6a2e6d168e6788e19f2806f72767770"
-    ;; too short
-    "12"
-    ;; too long
-    "12121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212"))
-
-(defparameter fail-encode
-  `((#(1 2 3) ,(hex-string-to-byte-array "badcab")) ; bad digest-name type
-    (:shaLOL ,(hex-string-to-byte-array "badcab")) ; unsupported digest
-    (:sha256 ,(hex-string-to-byte-array "12121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212121212")))) ; too long
-
-(defparameter equal-encode
-  ;; these are three ways of saying the same thing
-  `((:sha256 ,(hex-string-to-byte-array "badcab"))
-    ("sha256" ,(hex-string-to-byte-array "badcab"))
-    (#x12 ,(hex-string-to-byte-array "badcab"))))
-
-(defparameter multihash-object-cases
-  `((:sha256 "lol" "QmNpFhQ4bJgKDrm8nh211ayWvNL21s7r1y63BRHqfgp7s9")))
-
 ;;; utility functions
-
-(defun create-test-multihash (hex code)
-  (let ((bytes (hex-string-to-byte-array hex))
-        (new-bytes (make-array 2 :element-type '(unsigned-byte 8))))
-    (setf (aref new-bytes 0)  (coerce code '(unsigned-byte 8)))
-    (setf (aref new-bytes 1) (coerce (length bytes) '(unsigned-byte 8)))
-    (concatenate '(vector (unsigned-byte 8) *)
-                 new-bytes bytes)))
 
 (defun vector-equal (vector1 vector2)
   "Compares two vectors for equality."
@@ -100,98 +27,210 @@
           always (= (aref vector1 index) (aref vector2 index)))
     nil))
 
-;; Unit tests begin here
+;;; tests begin here
 
-(test encode
-  (loop for (hex code name) in test-cases
-        do (tagbody
-             (handler-bind ((error #'(lambda (condition)
-                                       (fail condition)
-                                       (go end))))
-               (let ((bytes (hex-string-to-byte-array hex))
-                     (new-bytes (make-array 2 :element-type '(unsigned-byte 8))))
-                 (setf (aref new-bytes 0) (coerce code '(unsigned-byte 8)))
-                 (setf (aref new-bytes 1) (coerce (length bytes) '(unsigned-byte 8)))
-                 (let ((new-bytes (concatenate '(vector (unsigned-byte 8) *)
-                                               new-bytes bytes))
-                       (encoded (encode name bytes)))
-                   (is (vector-equal encoded new-bytes)
-                       "encoded byte mismatch: ~S ~S"
-                       (byte-array-to-hex-string encoded)
-                       (byte-array-to-hex-string new-bytes))
-                   (let ((multihash (create-test-multihash hex code)))
-                     (is (vector-equal multihash new-bytes)
-                         "multihash func mismatch")))))
-             end)))
+(plan nil)
 
-(test decode
-  (loop for (hex code name) in test-cases
-        do (tagbody
-             (handler-bind ((error #'(lambda (condition)
-                                       (fail condition)
-                                       (go end))))
-               (let ((bytes (hex-string-to-byte-array hex))
-                     (new-bytes (make-array 2 :element-type '(unsigned-byte 8))))
-                 (setf (aref new-bytes 0) (coerce code '(unsigned-byte 8)))
-                 (setf (aref new-bytes 1) (coerce (length bytes) '(unsigned-byte 8)))
-                 (let* ((new-bytes (concatenate '(vector (unsigned-byte 8) *)
-                                                new-bytes bytes))
-                        (decoded (decode new-bytes)))
-                   (is (= (decoded-multihash-code decoded) code)
-                       "decoded code mismatch: ~X ~X"
-                       (decoded-multihash-code decoded)
-                       code)
-                   (is (equal (decoded-multihash-name decoded) name)
-                       "decoded name mismatch: ~S ~S"
-                       (symbol-name (decoded-multihash-name decoded))
-                       (symbol-name name))
-                   (is (= (decoded-multihash-length decoded) (length bytes))
-                       "decoded length mismatch: ~D ~D"
-                       (decoded-multihash-length decoded)
-                       (length bytes))
-                   (is (vector-equal (decoded-multihash-digest decoded) bytes)
-                       "decoded byte mismatch: ~S ~S"
-                       (byte-array-to-hex-string (decoded-multihash-digest decoded))
-                       (byte-array-to-hex-string bytes)))))
-             end)))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;
+;;; MULTIHASH.DEFINITIONS tests
 
-(test table
-  (loop for (code name) in test-codes
-     do
-       (is (eq (multihash-definition-name
-		(find code *multihash-definitions* :key #'multihash-definition-code))
-	       name)
-	   "Table mismatch: ~S ~S"
-	   (multihash-definition-name
-	    (find code *multihash-definitions* :key #'multihash-definition-code))
-	   name)
-       (is (= (multihash-definition-code
-	       (find name *multihash-definitions* :key #'multihash-definition-name))
-	      code)
-	   "Table mismatch: ~X ~X"
-	   (multihash-definition-code
-	    (find name *multihash-definitions* :key #'multihash-definition-name))
-	   code)))
+(diag "DEFINITIONS")
 
-(test valid-code
+(defparameter test-definitions
+  '((#x11 :sha1 20)
+    (#x12 :sha256 32)
+    (#x13 :sha512 64)
+    (#x14 :sha3 64)
+    (#x40 :blake2b 64)
+    (#x41 :blake2s 32)))
+
+(subtest "*DEFINITIONS*"
+  (loop for (code name length) in test-definitions
+	do
+	   (is code
+	       (multihash.definitions:definition-code
+		(find name multihash.definitions:*definitions*
+		      :key #'multihash.definitions:definition-name)))
+	do
+	   (is name
+	       (multihash.definitions:definition-name
+		(find code multihash.definitions:*definitions*
+		      :key #'multihash.definitions:definition-code)))
+	   (is length
+	       (multihash.definitions:definition-length
+		(find name multihash.definitions:*definitions*
+		      :key #'multihash.definitions:definition-name)))))
+
+(subtest "APP-CODE-P"
   (loop for code below #xff
-        do (let* ((test-code-exists ((lambda (code)
-                                       (loop for (test-code _) in test-codes
-                                             if (= code test-code)
-                                               return t))
-                                     code))
-                  (test-code-valid (or (app-code-p code) test-code-exists)))
-             (is (eql (valid-code-p code) test-code-valid)
-                 "VALID-CODE-P incorrect for ~X"
-                 code))))
+	do (is (multihash.definitions:app-code-p code)
+	       (and (>= code 0) (< code #x10)))))
 
-(test app-code
+(subtest "VALID-CODE-P"
   (loop for code below #xff
-        do (is (eql (app-code-p code) (and (>= code 0) (< code #x10)))
-               "APP-CODE-P incorrect for ~X"
-               code)))
+	for test-code-exists = (member code test-definitions
+				       :key #'car
+				       :test #'=)
+	for test-code-valid = (or
+			       (multihash.definitions:app-code-p
+				code)
+			       test-code-exists)
+	do
+	   (is (not (null
+		     (multihash.definitions:valid-code-p code)))
+	       (not (null test-code-valid)))))
 
-(defparameter b58-hex-equiv
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;
+;;; MULTIHASH.CORE tests
+
+(diag "CORE")
+
+(defparameter bad-test-octets
+  (list
+   #(9001 1 0)
+   (make-array 2 :element-type '(unsigned-byte 8)
+	       :initial-contents '(0 0))
+   (make-array 500 :element-type '(unsigned-byte 8))
+   (make-array 5 :element-type '(unsigned-byte 8)
+	       :initial-contents '(18 32 1 2 3))))
+
+(defparameter good-test-octets
+  (list (make-array 34 :element-type '(unsigned-byte 8)
+		       :initial-contents
+		       '(18 32 74 122 92 42 235 224 113 100 23 4 120 84 38 115 151 226 74 68 208 204
+  224 150 18 116 17 233 206 156 207 235 44 23))))
+
+(defparameter good-test-octets-parts
+  ;;; code name length digest hex-string b58-string
+  (list
+   '(18 :sha256 32
+     (74 122 92 42 235 224 113 100 23 4 120 84 38 115 151 226 74 68 208 204 224 150
+      18 116 17 233 206 156 207 235 44 23)
+     "12204a7a5c2aebe0716417047854267397e24a44d0cce096127411e9ce9ccfeb2c17"
+     "QmTMP6TqrfpSAeo4nbZ4BSRkcHZDs4hUwnbWH6hMJiikR4")))
+
+(subtest "MULTIHASH-OCTETS-P"
+  (loop for o in bad-test-octets
+	do (is (multihash.core:multihash-octets-p o) nil))
+
+  (loop for o in good-test-octets
+	do (isnt (multihash.core:multihash-octets-p o) nil)))
+
+;(subtest "%CODE")
+;(subtest "%LENGTH")
+;(subtest "%DIGEST")
+;(subtest "(SETF %CODE)")
+;(subtest "(SETF %LENGTH)")
+;(subtest "(SETF %DIGEST)")
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;
+;;; MULTIHASH.HASHING tests
+
+;(diag "MULTIHASH.HASHING")
+
+;(subtest "MULTIHASH-SEQUENCE")
+;(subtest "MULTIHASH-STREAM")
+;(subtest "MULTIHASH-FILE")
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;
+;;; MULTIHASH tests
+
+(diag "MULTIHASH")
+
+(subtest "HASH-CODE"
+  (loop for o in good-test-octets
+	for mhash = (make-instance 'multihash:simple-multihash
+				   :octets o)
+	for (code) in good-test-octets-parts
+	do (is (multihash:hash-code mhash) code)))
+
+(subtest "HASH-NAME"
+  (loop for o in good-test-octets
+	for mhash = (make-instance 'multihash:simple-multihash
+				   :octets o)
+	for (c name) in good-test-octets-parts
+	do (is (multihash:hash-name mhash) name)))
+
+(subtest "DIGEST"
+  (loop for o in good-test-octets
+	for mhash = (make-instance 'multihash:simple-multihash
+				   :octets o)
+	for (c n l _digest) in good-test-octets-parts
+	for digest = (make-array 32 :element-type '(unsigned-byte 8)
+				    :initial-contents _digest)
+	do (is (vector-equal (multihash:digest mhash) digest) t)))
+
+(subtest "HEX-STRING"
+  (loop for o in good-test-octets
+	for mhash = (make-instance 'multihash:simple-multihash
+				   :octets o)
+	for (c n l d hex-string) in good-test-octets-parts
+	do (is (multihash:hex-string mhash) hex-string)))
+
+(subtest "B58-STRING"
+  (loop for o in good-test-octets
+	for mhash = (make-instance 'multihash:simple-multihash
+				   :octets o)
+	for (c n l d hs b58-string) in good-test-octets-parts
+	do (is (multihash:b58-string mhash) b58-string)))
+
+(subtest "(setf HASH-CODE)"
+  (let ((new-code 17))
+    (loop for o in good-test-octets
+	  for mhash = (make-instance 'multihash:simple-multihash
+				     :octets o)
+	  for (c n length digest) in good-test-octets-parts
+	  for new-octets = (make-array (+ length 2)
+				       :element-type '(unsigned-byte 8)
+				       :initial-contents `(,new-code
+							   ,length
+							   ,@digest))
+	  do (setf (multihash:hash-code mhash)
+		   new-code)
+	  do (is (vector-equal (multihash:octets mhash) new-octets) t))))
+
+(subtest "(setf HASH-NAME)"
+  (let ((new-name :sha1))
+    (loop for o in good-test-octets
+	  for mhash = (make-instance 'multihash:simple-multihash
+				     :octets o)
+	  for (c n length digest) in good-test-octets-parts
+	  for new-code = (multihash.definitions:definition-code
+			  (find new-name multihash.definitions:*definitions*
+				:key #'multihash.definitions:definition-name))
+	  for new-octets = (make-array (+ length 2)
+				       :element-type '(unsigned-byte 8)
+				       :initial-contents `(,new-code
+							   ,length
+							   ,@digest))
+	  do (setf (multihash:hash-code mhash)
+		   new-code)
+	  do (is (vector-equal (multihash:octets mhash) new-octets) t))))
+
+(subtest "(setf DIGEST)"
+  (let ((new-digest-list '(1 2 3 4 5 6 7 8 9 10)))
+    (loop for o in good-test-octets
+	  for mhash = (make-instance 'multihash:simple-multihash
+				     :octets o)
+	  for (code) in good-test-octets-parts
+	  for new-digest = (make-array 10 :element-type '(unsigned-byte 8)
+					  :initial-contents new-digest-list)
+	  for new-length = (length new-digest-list)
+	  for new-octets = (make-array (+ new-length 2)
+				       :element-type '(unsigned-byte 8)
+				       :initial-contents
+				       `(,code
+					 ,new-length
+					 ,@new-digest-list))
+	  do (setf (multihash:digest mhash)
+		   new-digest)
+	  do (is (vector-equal (multihash:octets mhash) new-octets) t))))
+
+(defparameter b58-hex-string-pairs
   ;; generated with multihash tool
   '(("Qmexf4GiBrD46cEFjQBNoUz6iKSGHNeJWmD88gLNYohgqS"
      "1220f6f44b0636ea0fd0753339fc58379035c40a9efc356fd6ddf4841df4f4a85cb5")
@@ -200,36 +239,33 @@
     ("QmdRYiSeNbR9cDei4mmUMc7RAQZ2CPQev6yTBEoJEqQxuC"
      "1220e0206e2689ecaa75bdf76ac2b48124e09bb0d19dcb2744699b5d6a605a853a87")))
 
-(test from-base58-and-from-hex-string
-  (loop for (b58 hex) in b58-hex-equiv
-        do (is (vector-equal (from-base58 b58)
-                             (from-hex-string hex)))))
-(test to-base58
-  (loop for (b58 hex) in b58-hex-equiv
-        do (is (string= b58
-                        (to-base58 (from-hex-string hex))))))
+(subtest "B58-STRING"
+  (loop for (expected-b58-string hex-string) in b58-hex-string-pairs
+	for o = (hex-string-to-byte-array hex-string)
+	for mhash = (make-instance 'multihash:simple-multihash
+				     :octets o)
+	do (is (multihash:b58-string mhash) expected-b58-string)))
 
-(test to-hex-string
-  (loop for (b58 hex) in b58-hex-equiv
-        do (is (string= (to-hex-string (from-base58 b58))
-                        hex))))
+(subtest "HEX-STRING"
+  (loop for (bs expected-hex-string) in b58-hex-string-pairs
+	for o = (hex-string-to-byte-array expected-hex-string)
+	for mhash = (make-instance 'multihash:simple-multihash
+				   :octets o)
+	do (is (multihash:hex-string mhash)
+	       expected-hex-string)))
 
-(test bad-hashes
-  (loop for badhex in fail-multihashes
-    do (is-false (multihash-octets-p (hex-string-to-byte-array badhex)))))
+(finalize)
 
-(test fail-to-encode
-  (loop for (digest seq) in fail-encode
-    do (signals error (encode digest seq))))
+;(subtest "(SETF B58-STRING)")
+;(subtest "(SETF HEX-STRING)")
 
-(test equal-to-encode
-  (let ((m1 (apply #'encode (first equal-encode)))
-        (m2 (apply #'encode (second equal-encode)))
-        (m3 (apply #'encode (third equal-encode))))
-    (is (vector-equal m1 m2))
-    (is (vector-equal m2 m3))
-    (is (vector-equal m1 m3))))
+(defparameter multihash-object-cases
+  `((:sha256 "lol" "QmNpFhQ4bJgKDrm8nh211ayWvNL21s7r1y63BRHqfgp7s9")))
 
-(test multihash-object
-  (loop for (digest obj result) in multihash-object-cases
-        do (is (equal result (b58-string (multihash-object digest obj))))))
+;(subtest "%TO-OCTETS")
+
+(subtest "MULTIHASH-OBJECT"
+  (loop for (digest object expected-b58-string) in multihash-object-cases
+	for mhash = (multihash:multihash-object digest object)
+	do (is (multihash:b58-string mhash)
+	       expected-b58-string)))
