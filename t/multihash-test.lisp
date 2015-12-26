@@ -178,58 +178,6 @@
 	for (c n l d hs b58-string) in good-test-octets-parts
 	do (is (multihash:b58-string mhash) b58-string)))
 
-(subtest "(setf HASH-CODE)"
-  (let ((new-code 17))
-    (loop for o in good-test-octets
-	  for mhash = (make-instance 'multihash:simple-multihash
-				     :octets o)
-	  for (c n length digest) in good-test-octets-parts
-	  for new-octets = (make-array (+ length 2)
-				       :element-type '(unsigned-byte 8)
-				       :initial-contents `(,new-code
-							   ,length
-							   ,@digest))
-	  do (setf (multihash:hash-code mhash)
-		   new-code)
-	  do (is (vector-equal (multihash:octets mhash) new-octets) t))))
-
-(subtest "(setf HASH-NAME)"
-  (let ((new-name :sha1))
-    (loop for o in good-test-octets
-	  for mhash = (make-instance 'multihash:simple-multihash
-				     :octets o)
-	  for (c n length digest) in good-test-octets-parts
-	  for new-code = (multihash.definitions:definition-code
-			  (find new-name multihash.definitions:*definitions*
-				:key #'multihash.definitions:definition-name))
-	  for new-octets = (make-array (+ length 2)
-				       :element-type '(unsigned-byte 8)
-				       :initial-contents `(,new-code
-							   ,length
-							   ,@digest))
-	  do (setf (multihash:hash-code mhash)
-		   new-code)
-	  do (is (vector-equal (multihash:octets mhash) new-octets) t))))
-
-(subtest "(setf DIGEST)"
-  (let ((new-digest-list '(1 2 3 4 5 6 7 8 9 10)))
-    (loop for o in good-test-octets
-	  for mhash = (make-instance 'multihash:simple-multihash
-				     :octets o)
-	  for (code) in good-test-octets-parts
-	  for new-digest = (make-array 10 :element-type '(unsigned-byte 8)
-					  :initial-contents new-digest-list)
-	  for new-length = (length new-digest-list)
-	  for new-octets = (make-array (+ new-length 2)
-				       :element-type '(unsigned-byte 8)
-				       :initial-contents
-				       `(,code
-					 ,new-length
-					 ,@new-digest-list))
-	  do (setf (multihash:digest mhash)
-		   new-digest)
-	  do (is (vector-equal (multihash:octets mhash) new-octets) t))))
-
 (defparameter b58-hex-string-pairs
   ;; generated with multihash tool
   '(("Qmexf4GiBrD46cEFjQBNoUz6iKSGHNeJWmD88gLNYohgqS"

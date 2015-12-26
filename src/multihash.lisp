@@ -53,20 +53,11 @@
 (defgeneric hash-code (object)
   (:documentation "Returns the hash algorithm code of the multihash."))
 
-(defgeneric (setf hash-code) (code multihash)
-  (:documentation "Sets the hash algorithm code of the multihash."))
-
 (defgeneric hash-name (object)
   (:documentation "Returns the hash algorithm name of the multihash."))
 
-(defgeneric (setf hash-name) (name multihash)
-  (:documentation "Sets the hash algorithm of the multihash."))
-
 (defgeneric digest (object)
   (:documentation "Return the digest of the multihash."))
-
-(defgeneric (setf digest) (digest multihash)
-  (:documentation "Sets the digest of the multihash.") )
 
 ;;; input/output common representations
 
@@ -105,20 +96,11 @@
 (defmethod hash-code ((object simple-multihash))
   (%code (octets object)))
 
-(defmethod (setf hash-code) (code (object simple-multihash))
-  (setf (%code (octets object)) code))
-
 (defmethod hash-name ((object simple-multihash))
   (%name (octets object)))
 
-(defmethod (setf hash-name) (name (object simple-multihash))
-  (setf (%name (octets object)) name))
-
 (defmethod digest ((object simple-multihash))
   (%digest (octets object)))
-
-(defmethod (setf digest) (digest (object simple-multihash))
-  (setf (%digest (octets object)) digest))
 
 ;;; formatting methods
 

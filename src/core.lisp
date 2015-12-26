@@ -42,14 +42,6 @@ SEQUENCE must be a (SIMPLE-ARRAY (UNSIGNED-BYTE 8) (*))"
     (find (%code mhash-octets) *definitions*
           :key #'definition-code)))
 
-(defun (setf %name) (name mhash-octets)
-  (let ((definition (find name *definitions*
-                          :key #'definition-name)))
-    (if (null definition)
-      (error "No multihash definition found: ~S" name)
-      (setf (%code mhash-octets)
-             (definition-code definition)))))
-
 (defun %length (mhash-octets)
   (aref mhash-octets 1))
 
