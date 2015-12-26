@@ -87,7 +87,9 @@
 
 (diag "CORE")
 
-(defparameter bad-test-octets
+;;; symbol macros so we get fresh arrays
+
+(define-symbol-macro bad-test-octets
   (list
    #(9001 1 0)
    (make-array 2 :element-type '(unsigned-byte 8)
@@ -96,7 +98,7 @@
    (make-array 5 :element-type '(unsigned-byte 8)
 	       :initial-contents '(18 32 1 2 3))))
 
-(defparameter good-test-octets
+(define-symbol-macro good-test-octets
   (list (make-array 34 :element-type '(unsigned-byte 8)
 		       :initial-contents
 		       '(18 32 74 122 92 42 235 224 113 100 23 4 120 84 38 115 151 226 74 68 208 204
