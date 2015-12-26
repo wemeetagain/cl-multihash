@@ -143,13 +143,6 @@
 
 (diag "MULTIHASH")
 
-(subtest "HASH-CODE"
-  (loop for o in good-test-octets
-	for mhash = (make-instance 'multihash:multihash
-				   :octets o)
-	for (code) in good-test-octets-parts
-	do (is (multihash:hash-code mhash) code)))
-
 (subtest "HASH-NAME"
   (loop for o in good-test-octets
 	for mhash = (make-instance 'multihash:multihash

@@ -9,7 +9,6 @@
                 #:string-to-octets)
   (:export #:multihash
            ;; multihash interface
-           #:hash-code
            #:hash-name
            #:digest
            ;; formatting accessors
@@ -49,9 +48,6 @@
 
 ;;; multihash interface
 
-(defgeneric hash-code (object)
-  (:documentation "Returns the hash algorithm code of the multihash."))
-
 (defgeneric hash-name (object)
   (:documentation "Returns the hash algorithm name of the multihash."))
 
@@ -89,9 +85,6 @@
 (defmethod print-object ((object multihash) stream)
   (print-unreadable-object (object stream :type t :identity nil)
     (format stream "~S" (b58-string object))))
-
-(defmethod hash-code ((object multihash))
-  (%code (octets object)))
 
 (defmethod hash-name ((object multihash))
   (%name (octets object)))
