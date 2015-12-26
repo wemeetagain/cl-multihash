@@ -82,6 +82,14 @@
      :accessor octets
      :type multihash-octets)))
 
+(defmethod initialize-instance :after ((object multihash) &key b58-string hex-string &allow-other-keys)
+  (cond
+    (b58-string
+     (setf (b58-string object) b58-string))
+    (hex-string
+     (setf (hex-string object) hex-string))
+    (t nil)))
+
 (defmethod print-object ((object multihash) stream)
   (print-unreadable-object (object stream :type t :identity nil)
     (format stream "~S" (b58-string object))))
