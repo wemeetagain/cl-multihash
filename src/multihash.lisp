@@ -8,7 +8,6 @@
   (:import-from #:babel
                 #:string-to-octets)
   (:export #:multihash
-           #:simple-multihash
            ;; multihash interface
            #:hash-code
            #:hash-name
@@ -81,40 +80,38 @@
 
 ;;;
 
-(defclass multihash () ())
-
-(defclass simple-multihash (multihash)
+(defclass multihash ()
   ((%octets
      :initarg :octets
      :accessor octets
      :type multihash-octets)))
 
-(defmethod print-object ((object simple-multihash) stream)
+(defmethod print-object ((object multihash) stream)
   (print-unreadable-object (object stream :type t :identity nil)
     (format stream "~S" (b58-string object))))
 
-(defmethod hash-code ((object simple-multihash))
+(defmethod hash-code ((object multihash))
   (%code (octets object)))
 
-(defmethod hash-name ((object simple-multihash))
+(defmethod hash-name ((object multihash))
   (%name (octets object)))
 
-(defmethod digest ((object simple-multihash))
+(defmethod digest ((object multihash))
   (%digest (octets object)))
 
 ;;; formatting methods
 
-(defmethod hex-string ((object simple-multihash))
+(defmethod hex-string ((object multihash))
   (to-hex-string (octets object)))
 
-(defmethod (setf hex-string) ((hex-string string) (object simple-multihash))
+(defmethod (setf hex-string) ((hex-string string) (object multihash))
   (setf (octets object)
         (from-hex-string hex-string)))
 
-(defmethod b58-string ((object simple-multihash))
+(defmethod b58-string ((object multihash))
   (to-base58 (octets object)))
 
-(defmethod (setf b58-string) ((b58-string string) (object simple-multihash))
+(defmethod (setf b58-string) ((b58-string string) (object multihash))
   (setf (octets object)
         (from-base58 b58-string)))
 
@@ -147,5 +144,5 @@
     (multihash-stream digest stream))
 
 (defmethod multihash-object :around (digest stream)
-  (make-instance 'simple-multihash
+  (make-instance 'multihash
                  :octets (call-next-method)))

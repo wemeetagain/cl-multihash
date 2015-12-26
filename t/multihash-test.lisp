@@ -145,21 +145,21 @@
 
 (subtest "HASH-CODE"
   (loop for o in good-test-octets
-	for mhash = (make-instance 'multihash:simple-multihash
+	for mhash = (make-instance 'multihash:multihash
 				   :octets o)
 	for (code) in good-test-octets-parts
 	do (is (multihash:hash-code mhash) code)))
 
 (subtest "HASH-NAME"
   (loop for o in good-test-octets
-	for mhash = (make-instance 'multihash:simple-multihash
+	for mhash = (make-instance 'multihash:multihash
 				   :octets o)
 	for (c name) in good-test-octets-parts
 	do (is (multihash:hash-name mhash) name)))
 
 (subtest "DIGEST"
   (loop for o in good-test-octets
-	for mhash = (make-instance 'multihash:simple-multihash
+	for mhash = (make-instance 'multihash:multihash
 				   :octets o)
 	for (c n l _digest) in good-test-octets-parts
 	for digest = (make-array 32 :element-type '(unsigned-byte 8)
@@ -168,14 +168,14 @@
 
 (subtest "HEX-STRING"
   (loop for o in good-test-octets
-	for mhash = (make-instance 'multihash:simple-multihash
+	for mhash = (make-instance 'multihash:multihash
 				   :octets o)
 	for (c n l d hex-string) in good-test-octets-parts
 	do (is (multihash:hex-string mhash) hex-string)))
 
 (subtest "B58-STRING"
   (loop for o in good-test-octets
-	for mhash = (make-instance 'multihash:simple-multihash
+	for mhash = (make-instance 'multihash:multihash
 				   :octets o)
 	for (c n l d hs b58-string) in good-test-octets-parts
 	do (is (multihash:b58-string mhash) b58-string)))
@@ -192,14 +192,14 @@
 (subtest "B58-STRING"
   (loop for (expected-b58-string hex-string) in b58-hex-string-pairs
 	for o = (hex-string-to-byte-array hex-string)
-	for mhash = (make-instance 'multihash:simple-multihash
+	for mhash = (make-instance 'multihash:multihash
 				     :octets o)
 	do (is (multihash:b58-string mhash) expected-b58-string)))
 
 (subtest "HEX-STRING"
   (loop for (bs expected-hex-string) in b58-hex-string-pairs
 	for o = (hex-string-to-byte-array expected-hex-string)
-	for mhash = (make-instance 'multihash:simple-multihash
+	for mhash = (make-instance 'multihash:multihash
 				   :octets o)
 	do (is (multihash:hex-string mhash)
 	       expected-hex-string)))
