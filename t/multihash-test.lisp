@@ -204,7 +204,6 @@
 	do (is (multihash:hex-string mhash)
 	       expected-hex-string)))
 
-(finalize)
 
 ;(subtest "(SETF B58-STRING)")
 ;(subtest "(SETF HEX-STRING)")
@@ -219,3 +218,5 @@
 	for mhash = (multihash:multihash-object digest object)
 	do (is (multihash:b58-string mhash)
 	       expected-b58-string)))
+
+(finalize)
