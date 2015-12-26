@@ -32,17 +32,23 @@ SEQUENCE must be a (SIMPLE-ARRAY (UNSIGNED-BYTE 8) (*))"
        (valid-code-p (%code sequence))))
 
 (defun %code (mhash-octets)
+  (declare (optimize (speed 3) (safety 0))
+           (type (simple-array (unsigned-byte 8)) mhash-octets))
   (aref mhash-octets 0))
 
 (defun (setf %code) (code mhash-octets)
   (setf (aref mhash-octets 0) (the (unsigned-byte 8) code)))
 
 (defun %name (mhash-octets)
+  (declare (optimize (speed 3) (safety 0))
+           (type (simple-array (unsigned-byte 8)) mhash-octets))
   (definition-name
     (find (%code mhash-octets) *definitions*
           :key #'definition-code)))
 
 (defun %length (mhash-octets)
+  (declare (optimize (speed 3) (safety 0))
+           (type (simple-array (unsigned-byte 8)) mhash-octets))
   (aref mhash-octets 1))
 
 (defun (setf %length) (length mhash-octets)
@@ -55,6 +61,8 @@ SEQUENCE must be a (SIMPLE-ARRAY (UNSIGNED-BYTE 8) (*))"
         (setf mhash-octets (adjust-array mhash-octets (+ length 2)))))))
 
 (defun %digest (mhash-octets)
+  (declare (optimize (speed 3) (safety 0))
+           (type (simple-array (unsigned-byte 8)) mhash-octets))
   (subseq mhash-octets 2))
 
 (defun (setf %digest) (digest mhash-octets)
