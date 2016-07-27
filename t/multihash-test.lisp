@@ -202,7 +202,7 @@
 ;(subtest "(SETF HEX-STRING)")
 
 (defparameter multihash-object-cases
-  `((:sha256 "lol" "QmNpFhQ4bJgKDrm8nh211ayWvNL21s7r1y63BRHqfgp7s9")))
+  `((:sha256 "lol" "QmNpFhQ4bJgKDrm8nh211ayWvNL21s7r1y63BRHqfgp7ou")))
 
 ;(subtest "%TO-OCTETS")
 
