@@ -109,9 +109,9 @@ SEQUENCE must be a (SIMPLE-ARRAY (UNSIGNED-BYTE 8) (*))"
 SEQUENCE must be a (SIMPLE-ARRAY (UNSIGNED-BYTE 8) (*))"
   (declare (type (simple-array (unsigned-byte 8)) sequence))
   (if (multihash-octets-p sequence)
-    (values
-      (%code sequence)
-	  (%name sequence)
-	  (%length sequence)
-	  (%digest sequence))
-    (error "Invalid multihash octets: ~S" sequence)))
+      (values
+       (%code sequence)
+       (%name sequence)
+       (%length sequence)
+       (%digest sequence))
+      (error "Invalid multihash octets: ~S" sequence)))
