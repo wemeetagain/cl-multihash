@@ -19,7 +19,7 @@
 (defmethod multihash:%to-octets ((p person))
     (babel:string-to-octets (name p)))
 
-(multihash:multihash-object (make-instance 'person :name "Juan"))
+(multihash:multihash-object :sha256 (make-instance 'person :name "Juan"))
 
 ;; => #<MULTIHASH:MULTIHASH "Qmc33LKvyxLP2F164KjKpvT62J4RJrn4LMF4NcqH971JFH">
 
