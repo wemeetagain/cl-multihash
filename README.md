@@ -51,7 +51,7 @@
 
     Returns a base-58 string representation of the multihash.
 
-#### [generic function] `MULTIHASH-OBJECT (DIGEST OBJECT)`
+#### [generic function] `MULTIHASH-OBJECT (HASH-NAME OBJECT)`
 
     Returns a multihash of OBJECT.
 

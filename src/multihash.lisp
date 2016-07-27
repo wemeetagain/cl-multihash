@@ -128,22 +128,22 @@
 (defmethod %to-octets ((string string))
     (string-to-octets string))
 
-(defgeneric multihash-object (digest object)
+(defgeneric multihash-object (hash-name object)
     (:documentation "Returns a multihash of OBJECT."))
 
-(defmethod multihash-object (digest object)
+(defmethod multihash-object (hash-name object)
     (multihash-sequence
-      digest
+      hash-name
       (if (typep object '(simple-array (unsigned-byte 8) *))
           object
           (%to-octets object))))
 
-(defmethod multihash-object (digest (path pathname))
-    (multihash-file digest path))
+(defmethod multihash-object (hash-name (path pathname))
+    (multihash-file hash-name path))
 
-(defmethod multihash-object (digest (stream stream))
-    (multihash-stream digest stream))
+(defmethod multihash-object (hash-name (stream stream))
+    (multihash-stream hash-name stream))
 
-(defmethod multihash-object :around (digest stream)
+(defmethod multihash-object :around (hash-name stream)
   (make-instance 'multihash
                  :octets (call-next-method)))
