@@ -67,7 +67,7 @@ SEQUENCE must be a (SIMPLE-ARRAY (UNSIGNED-BYTE 8) (*))"
 
 (defun (setf %digest) (digest mhash-octets)
   (setf (%length mhash-octets) (length digest))
-  (setf (subseq mhash-octets 2 (1- (length mhash-octets)))
+  (setf (subseq mhash-octets 2 (length mhash-octets))
         digest))
 
 (defun encode (digest-name sequence)
